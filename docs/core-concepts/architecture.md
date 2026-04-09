@@ -84,6 +84,7 @@ Every package in praxis has a single responsibility and a stable interface bound
 | `orchestrator` | Central invocation kernel; drives the state machine and coordinates all subsystems | [pkg.go.dev](https://pkg.go.dev/github.com/praxis-os/praxis/orchestrator) |
 | `llm` | Provider-agnostic LLM interface, request/response types, and error taxonomy | [pkg.go.dev](https://pkg.go.dev/github.com/praxis-os/praxis/llm) |
 | `llm/anthropic` | Anthropic Claude adapter implementing `llm.Provider` | [pkg.go.dev](https://pkg.go.dev/github.com/praxis-os/praxis/llm/anthropic) |
+| `llm/openai` | OpenAI GPT adapter implementing `llm.Provider` (stdlib-only) | [pkg.go.dev](https://pkg.go.dev/github.com/praxis-os/praxis/llm/openai) |
 | `tools` | Tool definition, registration, and invocation via `tools.Invoker` | [pkg.go.dev](https://pkg.go.dev/github.com/praxis-os/praxis/tools) |
 | `hooks` | Policy hooks and filter chain interfaces (`PolicyHook`, `PreLLMFilter`, `PostToolFilter`) | [pkg.go.dev](https://pkg.go.dev/github.com/praxis-os/praxis/hooks) |
 | `budget` | Four-dimensional budget enforcement (`Guard`, `PriceProvider`) | [pkg.go.dev](https://pkg.go.dev/github.com/praxis-os/praxis/budget) |

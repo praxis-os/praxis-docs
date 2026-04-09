@@ -21,7 +21,7 @@ The following table is the complete set of public interfaces that define the v1.
 | Package | Interface | Purpose |
 |---|---|---|
 | `orchestrator` | `Orchestrator` | Public facade. `Invoke`. Fresh state machine per call. Safe for concurrent use. |
-| `llm` | `Provider` | Provider-agnostic adapter. `Complete`, `Stream`, `Name`, `Capabilities`. Shipped: `anthropic.Provider`. |
+| `llm` | `Provider` | Provider-agnostic adapter. `Complete`, `Stream`, `Name`, `Capabilities`. Shipped: `anthropic.Provider`, `openai.Provider`. |
 | `tools` | `Invoker` | Generic tool execution seam. Default: `NullInvoker`. |
 | `hooks` | `PolicyHook` | Policy evaluation at invocation lifecycle phases. Default: `AllowAllPolicyHook`. |
 | `hooks` | `PreLLMFilter`, `PostToolFilter` | Input/output filter chains. Decisions: `Pass`, `Redact`, `Log`, `Block`. |
@@ -41,6 +41,7 @@ Every public package lives under the `github.com/praxis-os/praxis` module path. 
 |---|---|---|
 | `orchestrator` | `github.com/praxis-os/praxis/orchestrator` | Entry point and lifecycle driver |
 | `llm` | `github.com/praxis-os/praxis/llm` | LLM provider abstraction |
+| `llm/openai` | `github.com/praxis-os/praxis/llm/openai` | OpenAI provider adapter |
 | `tools` | `github.com/praxis-os/praxis/tools` | Tool invocation abstraction |
 | `hooks` | `github.com/praxis-os/praxis/hooks` | Policy and filter hooks |
 | `budget` | `github.com/praxis-os/praxis/budget` | Resource enforcement |

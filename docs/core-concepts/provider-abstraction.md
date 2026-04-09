@@ -102,7 +102,7 @@ praxis ships with production-ready adapters for major LLM providers.
 | Adapter | Package | Status | Notes |
 |---------|---------|--------|-------|
 | Anthropic Claude | `llm/anthropic` | Available | Supports Claude model family, parallel tool calls, streaming |
-| OpenAI | `llm/openai` | Planned for v0.3.0 | GPT-4 and successors |
+| OpenAI | `llm/openai` | Available | GPT-4o and successors, stdlib-only HTTP transport |
 
 ### Anthropic Adapter
 
@@ -120,6 +120,30 @@ The adapter reports `SupportsParallelToolCalls: true`, enabling the orchestrator
 
 :::tip
 For a complete working example using the Anthropic adapter, see the [Quick Start](/docs/getting-started/quick-start) guide.
+:::
+
+### OpenAI Adapter
+
+The OpenAI adapter implements `llm.Provider` using the Chat Completions API. It relies only on Go's standard library for HTTP transport — no third-party SDK required.
+
+```go title="Creating an OpenAI provider"
+import "github.com/praxis-os/praxis/llm/openai"
+
+provider := openai.New(os.Getenv("OPENAI_API_KEY"),
+    openai.WithDefaultModel("gpt-4o"),
+)
+```
+
+Available options:
+
+| Option | Description |
+|---|---|
+| `WithDefaultModel(model)` | Default model when `LLMRequest.Model` is empty. Default: `"gpt-4o"`. |
+| `WithBaseURL(url)` | Override the API base URL. Useful for Azure OpenAI or proxies. Default: `"https://api.openai.com"`. |
+| `WithHTTPClient(c)` | Replace the default `http.Client` for API requests. |
+
+:::note
+The OpenAI provider does not yet implement native streaming. `Stream()` delegates to `Complete()` and delivers the result as a single final chunk.
 :::
 
 ## Error Classification

@@ -19,8 +19,9 @@ function HomepageHeader() {
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <p className={styles.heroDescription}>
           A production-grade Go library for orchestrating LLM agents with
-          enterprise guardrails built in: typed state machine, policy hooks,
-          budget enforcement, structured telemetry, and identity signing.
+          enterprise guardrails built in: multi-provider LLM support (Anthropic, OpenAI),
+          typed state machine, policy hooks, budget enforcement, structured
+          telemetry, and identity signing.
         </p>
         <div className={styles.buttons}>
           <Link

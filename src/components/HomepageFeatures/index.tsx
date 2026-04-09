@@ -23,8 +23,8 @@ const FeatureList: FeatureItem[] = [
     description: (
       <>
         Swap LLM providers via a single <code>llm.Provider</code> interface.
-        Ships with an Anthropic adapter; OpenAI planned for v0.3.0. Your
-        orchestration logic stays the same.
+        Ships with Anthropic and OpenAI adapters. Your orchestration logic
+        stays the same.
       </>
     ),
   },
