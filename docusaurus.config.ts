@@ -11,8 +11,8 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://praxis-os.github.io',
-  baseUrl: '/praxis-docs/',
+  url: 'https://praxis-docs.vercel.app',
+  baseUrl: '/',
 
   organizationName: 'praxis-os',
   projectName: 'praxis-docs',
@@ -65,7 +65,7 @@ const config: Config = {
     announcementBar: {
       id: 'v0x_unstable',
       content:
-        'These docs cover the <strong>development version</strong> (v0.x). APIs may change before v1.0. <a href="/praxis-docs/docs/getting-started/introduction#versioning-and-stability">Learn more</a>',
+        'These docs cover the <strong>development version</strong> (v0.x). APIs may change before v1.0. <a href="/docs/getting-started/introduction#versioning-and-stability">Learn more</a>',
       backgroundColor: '#fff3cd',
       textColor: '#856404',
       isCloseable: true,
