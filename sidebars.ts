@@ -64,6 +64,10 @@ const sidebars: SidebarsConfig = {
       items: [
         'examples/overview',
         'examples/minimal',
+        'examples/filters',
+        'examples/policy',
+        'examples/streaming',
+        'examples/tools',
       ],
     },
     {

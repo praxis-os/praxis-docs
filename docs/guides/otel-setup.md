@@ -3,7 +3,7 @@ title: "OpenTelemetry Setup"
 description: "How to configure OpenTelemetry tracing, Prometheus metrics, and structured logging with praxis."
 sidebar_label: "OpenTelemetry Setup"
 sidebar_position: 5
-keywords: [praxis, opentelemetry, otel, tracing, prometheus, metrics, logging, slog, spans, telemetry, AttributeEnricher]
+keywords: [praxis, opentelemetry, otel, tracing, prometheus, metrics, logging, slog, slogredact, RedactingHandler, spans, telemetry, AttributeEnricher]
 rag_section: "guides"
 rag_packages: ["telemetry"]
 rag_interfaces: ["telemetry.LifecycleEventEmitter", "telemetry.AttributeEnricher"]
@@ -168,34 +168,45 @@ praxis registers its metrics with the default Prometheus registerer. If you use 
 
 ## Structured Logging
 
-praxis uses Go's standard `slog` package for structured logging. The framework provides a `RedactingHandler` that wraps any `slog.Handler` and strips sensitive data from log output.
+praxis provides a `RedactingHandler` in the `slogredact` package (`github.com/praxis-os/praxis/telemetry/slog`) that wraps any `slog.Handler` and redacts sensitive attribute values before they reach log output.
 
-```go title="telemetry/redacting_handler.go"
-handler := telemetry.NewRedactingHandler(slog.NewJSONHandler(os.Stdout, nil))
+```go title="Setting up the RedactingHandler"
+import slogredact "github.com/praxis-os/praxis/telemetry/slog"
+
+handler := slogredact.NewRedactingHandler(slog.NewJSONHandler(os.Stdout, nil))
 logger := slog.New(handler)
 slog.SetDefault(logger)
 ```
 
-The `RedactingHandler` automatically strips three categories of sensitive data:
+The handler uses **case-insensitive substring matching** on attribute keys. Any attribute whose key contains a deny-list substring has its value replaced with `[REDACTED]`. The default deny list covers common secret-bearing key names:
 
-| Category | What is redacted | Replacement |
-|----------|-----------------|-------------|
-| Credentials | API keys, bearer tokens, authorization headers | `[CREDENTIAL_REDACTED]` |
-| Raw LLM responses | Full response bodies from LLM providers | `[LLM_RESPONSE_REDACTED]` |
-| PII markers | Fields tagged with the `pii` log attribute key | `[PII_REDACTED]` |
+| Deny substring | Example keys matched |
+|---|---|
+| `token` | `api_token`, `access_token`, `TOKEN_VALUE` |
+| `key` | `api_key`, `secret_key`, `API_KEY` |
+| `secret` | `client_secret`, `SECRET` |
+| `password` | `db_password`, `PASSWORD` |
+| `credential` | `credential_id`, `CREDENTIAL` |
+| `authorization` | `Authorization`, `proxy_authorization` |
 
-```go title="Logging with PII markers"
-logger.Info("processing request",
-    "user_email", slog.String("pii", "user@example.com"),
-    "request_id", requestID,
+The deny list is customisable through three options:
+
+```go title="Customising redaction"
+handler := slogredact.NewRedactingHandler(inner,
+    slogredact.WithAdditionalDenyKeys("ssn", "cvv"),    // extend defaults
+    slogredact.WithRedactedValue("<REMOVED>"),           // custom placeholder
 )
-// Output: {"msg":"processing request","user_email":"[PII_REDACTED]","request_id":"abc123"}
+
+// Or replace the default deny list entirely:
+handler := slogredact.NewRedactingHandler(inner,
+    slogredact.WithDenyList("api_token", "bearer"),
+)
 ```
 
-The redacting handler ensures that even if your code logs sensitive data, it does not appear in log output. This is a defense-in-depth measure -- the handler catches sensitive data that slips past code review.
+The handler is safe for concurrent use, holds no mutable state after construction, and handles group attributes recursively. It operates on a shallow clone of each log record, so the original record is never mutated.
 
 :::warning
-The `RedactingHandler` uses pattern matching and field name heuristics. It is not a substitute for careful log hygiene in your application code. Avoid logging raw user input or tool output at debug level in production.
+The `RedactingHandler` uses substring matching on attribute keys. It is not a substitute for careful log hygiene in your application code. Avoid logging raw user input or tool output at debug level in production.
 :::
 
 For the full `telemetry` package API, see [pkg.go.dev/github.com/praxis-os/praxis/telemetry](https://pkg.go.dev/github.com/praxis-os/praxis/telemetry).

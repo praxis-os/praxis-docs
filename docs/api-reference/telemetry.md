@@ -33,7 +33,36 @@ The package follows a strict separation: the framework emits neutral events and 
 
 ### telemetry/slog
 
-Provides a `RedactingHandler` for Go's `log/slog` that strips sensitive data from log output. Redaction targets include credentials, raw LLM responses, and values matching configurable PII marker patterns.
+Package `slogredact` (`github.com/praxis-os/praxis/telemetry/slog`) provides a `RedactingHandler` that wraps any `slog.Handler` and redacts sensitive attribute values before forwarding log records to the inner handler.
+
+**Constructor:**
+
+```go
+import slogredact "github.com/praxis-os/praxis/telemetry/slog"
+
+handler := slogredact.NewRedactingHandler(slog.NewJSONHandler(os.Stderr, nil))
+```
+
+**Matching behavior:** any slog attribute whose key contains a deny-list substring (case-insensitive) has its value replaced with a placeholder. The default deny list covers common secret-bearing key names:
+
+`token`, `key`, `secret`, `password`, `credential`, `authorization`
+
+**Configuration options:**
+
+| Option | Description |
+|---|---|
+| `WithDenyList(keys ...string)` | Replace the default deny list entirely. |
+| `WithAdditionalDenyKeys(keys ...string)` | Extend the default deny list with additional substrings. |
+| `WithRedactedValue(v string)` | Override the placeholder (default: `[REDACTED]`). |
+
+```go title="Custom configuration"
+handler := slogredact.NewRedactingHandler(inner,
+    slogredact.WithAdditionalDenyKeys("ssn", "cvv"),
+    slogredact.WithRedactedValue("<REMOVED>"),
+)
+```
+
+The handler is safe for concurrent use. It holds no mutable state after construction. Group attributes are handled recursively.
 
 ### telemetry/metrics
 

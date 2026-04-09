@@ -3,9 +3,9 @@ title: "llm Package"
 description: "The llm package defines the provider-agnostic abstraction layer that lets praxis work with any LLM backend through a single typed interface."
 sidebar_label: "llm"
 sidebar_position: 3
-keywords: [praxis, llm, provider, complete, stream, message, anthropic, abstraction, model, capabilities]
+keywords: [praxis, llm, provider, complete, stream, message, anthropic, openai, abstraction, model, capabilities]
 rag_section: "api-reference"
-rag_packages: ["llm"]
+rag_packages: ["llm", "llm/anthropic", "llm/openai"]
 rag_interfaces: ["llm.Provider"]
 rag_difficulty: "intermediate"
 ---
@@ -16,7 +16,7 @@ rag_difficulty: "intermediate"
 
 The `llm` package defines the abstraction boundary between praxis and any LLM backend. Rather than coding against a specific provider's SDK, callers and framework internals program against the `Provider` interface. This makes it possible to swap providers, add new ones, or build test doubles without changing orchestration logic.
 
-The package ships one production implementation -- `anthropic.Provider` -- in the `llm/anthropic` sub-package. Adding support for a new provider means implementing four methods on the `Provider` interface.
+The package ships two production implementations: `anthropic.Provider` in `llm/anthropic` and `openai.Provider` in `llm/openai`. Adding support for a new provider means implementing four methods on the `Provider` interface.
 
 ## Key Interfaces and Types
 
@@ -74,6 +74,30 @@ provider := anthropic.NewProvider(
 ```
 
 The provider resolves API credentials through the `credentials.Resolver` passed to the orchestrator, not through its own constructor. This keeps secret material out of long-lived objects.
+
+### Using the OpenAI Provider
+
+The `llm/openai` sub-package provides a Chat Completions API adapter. It uses only the Go standard library for HTTP transport -- no third-party SDK.
+
+```go title="Creating the OpenAI provider"
+import "github.com/praxis-os/praxis/llm/openai"
+
+provider := openai.New(os.Getenv("OPENAI_API_KEY"),
+    openai.WithDefaultModel("gpt-4o"),
+)
+```
+
+Available options:
+
+| Option | Description |
+|---|---|
+| `WithDefaultModel(model)` | Default model when `LLMRequest.Model` is empty. Default: `"gpt-4o"`. |
+| `WithBaseURL(url)` | Override the API base URL. Useful for Azure OpenAI or proxies. Default: `"https://api.openai.com"`. |
+| `WithHTTPClient(c)` | Replace the default `http.Client` for API requests. |
+
+:::note
+The OpenAI provider does not yet implement native streaming. `Stream()` delegates to `Complete()` and delivers the result as a single final chunk.
+:::
 
 ### Test Doubles
 

@@ -3,7 +3,7 @@ title: "credentials Package"
 description: "The credentials package manages secret material lifecycle with per-call resolution and automatic zeroing to prevent credential leakage."
 sidebar_label: "credentials"
 sidebar_position: 7
-keywords: [praxis, credentials, resolver, secret, zeroing, security, api-key, per-call, lifecycle]
+keywords: [praxis, credentials, resolver, secret, zeroing, ZeroBytes, security, api-key, per-call, lifecycle]
 rag_section: "api-reference"
 rag_packages: ["credentials"]
 rag_interfaces: ["credentials.Resolver"]

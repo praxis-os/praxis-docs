@@ -3,7 +3,7 @@ title: "Identity Signing (Ed25519 JWT)"
 description: "How to configure per-tool-call identity assertion using Ed25519 JWT tokens for secure agent identification in praxis."
 sidebar_label: "Identity Signing"
 sidebar_position: 7
-keywords: [identity, signer, Ed25519, JWT, claims, token, kid, parent_token, invocation_id, tool_name, key-management]
+keywords: [identity, signer, Ed25519, JWT, EdDSA, RFC8037, UUIDv7, claims, token, kid, parent_token, invocation_id, tool_name, key-management, stdlib]
 rag_section: "guides"
 rag_packages: ["identity"]
 rag_interfaces: ["identity.Signer"]
@@ -30,7 +30,7 @@ Each identity token contains 5 registered claims and 2 custom praxis claims:
 | `sub` | registered | Subject identifier (caller-configured) |
 | `exp` | registered | Expiration time |
 | `iat` | registered | Issued-at time |
-| `jti` | registered | Unique token ID |
+| `jti` | registered | Unique token ID (UUIDv7 per RFC 9562) |
 | `praxis.invocation_id` | custom | The invocation that generated this token |
 | `praxis.tool_name` | custom | The tool being called |
 
@@ -55,19 +55,19 @@ if err != nil {
     log.Fatal(err)
 }
 
-signer := identity.NewEd25519Signer(priv, identity.SignerConfig{
-    Issuer:        "my-platform",
-    Subject:       "agent-service",
-    KeyID:         "key-2026-04",
-    TokenLifetime: 60 * time.Second,
-})
+signer, err := identity.NewEd25519Signer(priv)
+if err != nil {
+    log.Fatal(err)
+}
 
 orch, err := orchestrator.New(provider,
     orchestrator.WithIdentitySigner(signer),
 )
 ```
 
-The `KeyID` appears in the JWT `kid` header, allowing token consumers to look up the correct public key for verification.
+`NewEd25519Signer` accepts functional options of type `SignerOption` for customisation. The default issuer is `"praxis"` and the default token lifetime is 60 seconds.
+
+The `Ed25519Signer` uses only stdlib packages (`crypto/ed25519`, `encoding/json`, `encoding/base64`, `crypto/rand`) with an internal JWT encoder -- no external JWT library is imported. Each token's `jti` is a UUIDv7 (RFC 9562) value generated with a millisecond-precision timestamp prefix and `crypto/rand` for the remaining bits.
 
 ## Key Management
 

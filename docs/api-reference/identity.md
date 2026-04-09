@@ -3,7 +3,7 @@ title: "identity Package"
 description: "The identity package provides cryptographic identity assertion for tool calls using Ed25519-signed JWTs with short lifetimes and invocation-scoped claims."
 sidebar_label: "identity"
 sidebar_position: 8
-keywords: [praxis, identity, signer, ed25519, jwt, tool-call, assertion, chaining, parent-token, claims]
+keywords: [praxis, identity, signer, ed25519, jwt, tool-call, assertion, chaining, parent-token, claims, UUIDv7, EdDSA, stdlib]
 rag_section: "api-reference"
 rag_packages: ["identity"]
 rag_interfaces: ["identity.Signer"]
@@ -22,25 +22,26 @@ The reference implementation uses Ed25519 signing with short-lived tokens. This 
 
 | Name | Kind | Description |
 |---|---|---|
-| `Signer` | Interface | Produces a signed JWT for a given tool call. Single method: `Sign`. |
-| `Ed25519Signer` | Struct | Reference implementation using Ed25519 keys. |
-| `TokenClaims` | Struct | The JWT claim set, including both registered and custom claims. |
+| `Signer` | Interface | Produces a signed JWT for a given tool call. Single method: `Sign(ctx, claims map[string]any) (string, error)`. |
+| `Ed25519Signer` | Struct | Reference implementation using Ed25519 keys. Stdlib-only (no external JWT library). |
+| `SignerOption` | Function type | Functional option for configuring `Ed25519Signer`. |
 
 ## Usage Patterns
 
 ### JWT Claim Set
 
-Every identity token contains five registered JWT claims and two custom claims scoped to praxis.
+Every identity token contains five registered JWT claims and three custom claims scoped to praxis.
 
 | Claim | Type | Description |
 |---|---|---|
-| `iss` | Registered | Issuer identifier. Typically the service or orchestrator name. |
-| `sub` | Registered | Subject. Identifies the caller or agent. |
-| `exp` | Registered | Expiration timestamp. |
-| `iat` | Registered | Issued-at timestamp. |
-| `jti` | Registered | Unique token ID for replay prevention. |
+| `iss` | Registered | Issuer identifier (default: `"praxis"`). |
+| `sub` | Registered | Subject. Automatically set to the `praxis.invocation_id` value. |
+| `exp` | Registered | Expiration timestamp (NumericDate). |
+| `iat` | Registered | Issued-at timestamp (NumericDate). |
+| `jti` | Registered | Unique token ID (UUIDv7 per RFC 9562) for replay prevention. |
 | `praxis.invocation_id` | Custom | The invocation ID from the current state machine. |
 | `praxis.tool_name` | Custom | The name of the tool being called. |
+| `praxis.parent_token` | Custom | The parent invocation's JWT, present in agent-as-tool compositions. |
 
 ### Token Lifetime
 
@@ -56,13 +57,17 @@ signer := identity.NewEd25519Signer(
 
 ### Signing and Verification
 
-The `Signer` interface has a single method that receives the invocation ID, tool name, and optional additional claims. It returns a compact JWT string.
+The `Signer` interface has a single method that receives a claims map and returns a compact JWT string. The signer sets mandatory claims (`iss`, `sub`, `iat`, `exp`, `jti`) which override any values in the incoming map.
 
 ```go title="Signer interface"
 type Signer interface {
-    Sign(ctx context.Context, invocationID string, toolName string) (string, error)
+    Sign(ctx context.Context, claims map[string]any) (string, error)
 }
 ```
+
+The orchestrator passes `praxis.invocation_id` and `praxis.tool_name` through the claims map. The `Ed25519Signer` automatically extracts these to populate the `sub` and custom claims.
+
+Token encoding uses an internal `jwt` package that implements EdDSA (RFC 8037) with base64url encoding (RFC 7515). The entire implementation is stdlib-only -- no external JWT library is imported.
 
 Downstream services verify the token using the corresponding Ed25519 public key. The `praxis.invocation_id` and `praxis.tool_name` claims allow the verifier to confirm which invocation and tool call produced the request.
 
