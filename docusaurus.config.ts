@@ -63,9 +63,9 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     announcementBar: {
-      id: 'v0x_unstable',
+      id: 'v0x_unstable_v09',
       content:
-        'These docs cover the <strong>development version</strong> (v0.x). APIs may change before v1.0. <a href="/docs/getting-started/introduction#versioning-and-stability">Learn more</a>',
+        'Docs cover root <strong>v0.9.x</strong> with <code>praxis/mcp</code> v0.7 and <code>praxis/skills</code> v0.9 sub-modules. APIs may change before v1.0. <a href="/docs/getting-started/introduction#versioning-and-stability">Learn more</a>',
       backgroundColor: '#fff3cd',
       textColor: '#856404',
       isCloseable: true,

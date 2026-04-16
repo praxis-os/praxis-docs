@@ -3,9 +3,9 @@ title: "Examples Overview"
 description: "Index of runnable praxis examples demonstrating common usage patterns from minimal setup to advanced compositions."
 sidebar_label: "Overview"
 sidebar_position: 1
-keywords: [examples, minimal, filters, policy, streaming, tools, runnable, code, demo, ANTHROPIC_API_KEY, mock]
+keywords: [examples, minimal, filters, policy, streaming, tools, mcp, skills, runnable, code, demo, ANTHROPIC_API_KEY, MCP_TOKEN, mock]
 rag_section: "examples"
-rag_packages: ["orchestrator", "llm", "llm/anthropic", "llm/mock", "hooks", "tools", "event"]
+rag_packages: ["orchestrator", "llm", "llm/anthropic", "llm/mock", "hooks", "tools", "event", "mcp", "skills", "credentials"]
 rag_interfaces: []
 rag_difficulty: "beginner"
 ---
@@ -23,10 +23,13 @@ Runnable examples demonstrating praxis usage patterns. All examples live in the 
 | [Policy](/docs/examples/policy) | PolicyHook with three decision types | `PolicyHook`, `Allow`, `Deny`, `RequireApproval` |
 | [Streaming](/docs/examples/streaming) | InvokeStream event channel draining | `InvokeStream`, event channel, `IsTerminal` |
 | [Tools](/docs/examples/tools) | Custom tools.Invoker with weather tool | `Invoker`, `ToolDefinition`, `ToolResult`, tool-use loop |
+| [MCP (stdio)](/docs/examples/mcp-stdio) | Local MCP server fronted by `mcp.Invoker` | `mcp.New`, `TransportStdio`, tool namespacing, response cap |
+| [MCP (HTTP)](/docs/examples/mcp-http) | Remote MCP server with bearer-token credential | `mcp.New`, `TransportHTTP`, `credentials.Resolver`, headers |
+| [Skills](/docs/examples/skills) | Loading a SKILL.md bundle and composing the system prompt | `skills.Load`, `WithSkill`, `ComposedInstructions` |
 
 ## Running Examples
 
-Most examples use a mock provider and need no API key. The `minimal` and `tools` examples require an Anthropic API key:
+Most examples use a mock provider and need no API key. The `minimal`, `tools`, `skills`, and both `mcp` examples require an Anthropic API key. The MCP stdio example additionally needs the target MCP server binary on `PATH`; the MCP HTTP example needs `MCP_TOKEN` set:
 
 ```bash title="terminal"
 # For examples that need an API key:

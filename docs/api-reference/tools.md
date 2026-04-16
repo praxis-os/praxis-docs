@@ -29,6 +29,8 @@ The package also defines `InvocationContext`, a read-only container that gives t
 | `InvocationContext` | Struct | Read-only container for framework state passed to tools. Includes invocation ID, budget snapshot, identity token. |
 | `NullInvoker` | Struct | Default invoker that returns `StatusDenied` for every tool call. |
 
+For Model Context Protocol servers, use the [`mcp` package](./mcp.md), which implements `tools.Invoker` over stdio and Streamable HTTP transports.
+
 ## Usage Patterns
 
 ### Implementing an Invoker

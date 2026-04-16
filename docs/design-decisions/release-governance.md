@@ -3,7 +3,7 @@ title: "Release Governance"
 description: "Key design decisions on praxis release process: deprecation windows, conventional commits, coverage gates, production consumer requirement, and DCO sign-off."
 sidebar_label: "Release Governance"
 sidebar_position: 7
-keywords: [release, governance, deprecation, conventional-commits, coverage, 85-percent, DCO, sign-off, production-consumer, D81, D83, D86, D91, D92]
+keywords: [release, governance, deprecation, conventional-commits, coverage, 85-percent, DCO, sign-off, production-consumer, sub-modules, mcp, skills, D81, D83, D86, D91, D92, D106]
 rag_section: "design-decisions"
 rag_packages: []
 rag_interfaces: []
@@ -46,6 +46,27 @@ The v1.0 release also requires:
 - Trademark review complete
 - All 14 frozen interfaces stable for at least one minor release
 - 85% coverage gate passing across all packages
+
+## D106: Sub-Module Versioning
+
+The `praxis/mcp` and `praxis/skills` packages are released as **independently versioned Go sub-modules**, each with its own `go.mod` and its own SemVer track (`praxis/mcp/vX.Y.Z`, `praxis/skills/vX.Y.Z`). The root module and sub-modules ship together from a single repository but are tagged separately by `release-please`.
+
+Rationale: decouple integration-surface evolution (new transports, new bundle formats, new connectors) from the root invocation-kernel interface stability. A breaking change in `praxis/mcp` does not force a root minor bump, and a root v1.0 freeze does not block sub-module experimentation.
+
+What sub-modules share with the root:
+
+- D81 deprecation window (2 minor releases / 6 months).
+- D83 conventional-commit format and `release-please`-driven changelog.
+- D86 85% coverage gate, enforced per-module.
+- D92 DCO sign-off requirement.
+
+What sub-modules own independently:
+
+- SemVer cadence and `vX.Y.Z` interpretation.
+- Public API freeze target (e.g., `praxis/mcp/v1.0.0` is independent of root `v1.0.0`).
+- Coverage measurement scope.
+
+Consumers add sub-modules with explicit imports: `go get github.com/praxis-os/praxis/mcp@v0.7.x` and `go get github.com/praxis-os/praxis/skills@v0.9.x`. The root module remains importable on its own; the sub-modules are opt-in.
 
 ## D92: DCO Sign-Off
 

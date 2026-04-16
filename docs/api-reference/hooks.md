@@ -25,7 +25,7 @@ Policy hooks operate at four discrete phases of every invocation. Content filter
 | `PolicyHook` | Interface | Evaluates policy at four lifecycle phases. Returns a `Decision`. |
 | `Decision` | Struct | A policy verdict with a reason string. Verdicts: `Allow`, `Deny`. |
 | `PreLLMFilter` | Interface | Inspects or transforms messages before they reach the LLM provider. |
-| `PostToolFilter` | Interface | Inspects or transforms tool results before they re-enter the conversation. |
+| `PostToolFilter` | Interface | Inspects or transforms tool results before they re-enter the conversation. Applies uniformly to native tool results and to results from the [`mcp` package](./mcp.md), since both flow through the same `tools.Invoker` seam. |
 | `FilterDecision` | Struct | Filter outcome. Actions: `Pass`, `Redact`, `Log`, `Block`. |
 | `AllowAllPolicyHook` | Struct | Default policy hook that returns `Allow` for every phase. |
 

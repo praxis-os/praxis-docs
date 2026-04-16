@@ -23,12 +23,14 @@ It is the library a team reaches for when "call an LLM in a loop" is not enough,
 **What it gives you out of the box:**
 
 - A typed, eleven-state invocation finite state machine with allow-listed transitions and property-based tests
-- A provider-agnostic `llm.Provider` interface with a shipped Anthropic adapter (OpenAI adapter in v0.3.0)
+- A provider-agnostic `llm.Provider` interface with shipped Anthropic and OpenAI adapters
 - A four-phase policy hook model (`PreInvocation`, `PreLLMInput`, `PostToolOutput`, `PostInvocation`) plus pre-LLM and post-tool filter chains that can `Pass`, `Redact`, `Log`, or `Block`
 - Four-dimensional budget enforcement: wall-clock duration, LLM tokens, tool call count, cost estimate in micro-dollars
 - A typed error taxonomy driving a differentiated retry policy
 - Mandatory OpenTelemetry spans and a neutral lifecycle event stream
 - Optional per-tool-call identity assertion via `identity.Signer` (Ed25519 JWT reference impl)
+- A Model Context Protocol client (`praxis/mcp` sub-module) that fronts stdio and Streamable HTTP MCP servers behind the standard `tools.Invoker` seam, with credential injection, response-size caps, and bounded-cardinality metrics
+- Skill packs (`praxis/skills` sub-module) for loading `SKILL.md` capability bundles from `fs.FS` and composing them into the system prompt
 
 ## What praxis is NOT
 

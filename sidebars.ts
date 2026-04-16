@@ -42,6 +42,8 @@ const sidebars: SidebarsConfig = {
         'api-reference/state',
         'api-reference/event',
         'api-reference/telemetry',
+        'api-reference/mcp',
+        'api-reference/skills',
       ],
     },
     {
@@ -56,6 +58,8 @@ const sidebars: SidebarsConfig = {
         'guides/budget-config',
         'guides/identity-signing',
         'guides/streaming',
+        'guides/mcp-integration',
+        'guides/skills-authoring',
       ],
     },
     {
@@ -68,6 +72,9 @@ const sidebars: SidebarsConfig = {
         'examples/policy',
         'examples/streaming',
         'examples/tools',
+        'examples/mcp-stdio',
+        'examples/mcp-http',
+        'examples/skills',
       ],
     },
     {

@@ -3,10 +3,10 @@ title: "API Reference Overview"
 description: "The praxis API reference covers all public packages, interfaces, and types that make up the v1.0 interface surface for enterprise LLM agent orchestration."
 sidebar_label: "Overview"
 sidebar_position: 1
-keywords: [praxis, api, reference, interfaces, packages, orchestrator, llm, tools, hooks, budget, credentials, identity, errors, state, event, telemetry]
+keywords: [praxis, api, reference, interfaces, packages, orchestrator, llm, tools, hooks, budget, credentials, identity, errors, state, event, telemetry, mcp, skills, sub-modules]
 rag_section: "api-reference"
-rag_packages: ["orchestrator", "llm", "tools", "hooks", "budget", "credentials", "identity", "errors", "state", "event", "telemetry"]
-rag_interfaces: ["orchestrator.Orchestrator", "llm.Provider", "tools.Invoker", "hooks.PolicyHook", "budget.Guard", "credentials.Resolver", "identity.Signer", "errors.TypedError", "telemetry.LifecycleEventEmitter"]
+rag_packages: ["orchestrator", "llm", "tools", "hooks", "budget", "credentials", "identity", "errors", "state", "event", "telemetry", "mcp", "skills"]
+rag_interfaces: ["orchestrator.Orchestrator", "llm.Provider", "tools.Invoker", "hooks.PolicyHook", "budget.Guard", "credentials.Resolver", "identity.Signer", "errors.TypedError", "telemetry.LifecycleEventEmitter", "mcp.Invoker"]
 rag_difficulty: "intermediate"
 ---
 
@@ -35,22 +35,25 @@ The following table is the complete set of public interfaces that define the v1.
 
 ## Package Map
 
-Every public package lives under the `github.com/praxis-os/praxis` module path. The table below shows each package, its import path, and its role in the framework.
+Most public packages live under the root `github.com/praxis-os/praxis` Go module. Two packages — `mcp` and `skills` — are **independently versioned Go sub-modules** with their own `go.mod`. You add them separately (`go get github.com/praxis-os/praxis/mcp@v0.7.x`, `go get github.com/praxis-os/praxis/skills@v0.9.x`) so they can evolve without forcing a root minor bump.
 
-| Package | Import Path | Role |
-|---|---|---|
-| `orchestrator` | `github.com/praxis-os/praxis/orchestrator` | Entry point and lifecycle driver |
-| `llm` | `github.com/praxis-os/praxis/llm` | LLM provider abstraction |
-| `llm/openai` | `github.com/praxis-os/praxis/llm/openai` | OpenAI provider adapter |
-| `tools` | `github.com/praxis-os/praxis/tools` | Tool invocation abstraction |
-| `hooks` | `github.com/praxis-os/praxis/hooks` | Policy and filter hooks |
-| `budget` | `github.com/praxis-os/praxis/budget` | Resource enforcement |
-| `credentials` | `github.com/praxis-os/praxis/credentials` | Secret material lifecycle |
-| `identity` | `github.com/praxis-os/praxis/identity` | Cryptographic identity assertion |
-| `errors` | `github.com/praxis-os/praxis/errors` | Typed error taxonomy |
-| `state` | `github.com/praxis-os/praxis/state` | State machine constants and transitions |
-| `event` | `github.com/praxis-os/praxis/event` | Lifecycle event types |
-| `telemetry` | `github.com/praxis-os/praxis/telemetry` | Observability primitives |
+| Package | Import Path | Module | Role |
+|---|---|---|---|
+| `orchestrator` | `github.com/praxis-os/praxis/orchestrator` | `praxis` (root) | Entry point and lifecycle driver |
+| `llm` | `github.com/praxis-os/praxis/llm` | `praxis` (root) | LLM provider abstraction |
+| `llm/anthropic` | `github.com/praxis-os/praxis/llm/anthropic` | `praxis` (root) | Anthropic provider adapter |
+| `llm/openai` | `github.com/praxis-os/praxis/llm/openai` | `praxis` (root) | OpenAI provider adapter |
+| `tools` | `github.com/praxis-os/praxis/tools` | `praxis` (root) | Tool invocation abstraction |
+| `hooks` | `github.com/praxis-os/praxis/hooks` | `praxis` (root) | Policy and filter hooks |
+| `budget` | `github.com/praxis-os/praxis/budget` | `praxis` (root) | Resource enforcement |
+| `credentials` | `github.com/praxis-os/praxis/credentials` | `praxis` (root) | Secret material lifecycle |
+| `identity` | `github.com/praxis-os/praxis/identity` | `praxis` (root) | Cryptographic identity assertion |
+| `errors` | `github.com/praxis-os/praxis/errors` | `praxis` (root) | Typed error taxonomy |
+| `state` | `github.com/praxis-os/praxis/state` | `praxis` (root) | State machine constants and transitions |
+| `event` | `github.com/praxis-os/praxis/event` | `praxis` (root) | Lifecycle event types |
+| `telemetry` | `github.com/praxis-os/praxis/telemetry` | `praxis` (root) | Observability primitives |
+| `mcp` | `github.com/praxis-os/praxis/mcp` | `praxis/mcp` (v0.7.x, independent) | Model Context Protocol client behind the `tools.Invoker` seam |
+| `skills` | `github.com/praxis-os/praxis/skills` | `praxis/skills` (v0.9.x, independent) | `SKILL.md` bundle loader and system-prompt composer |
 
 ## Stability Tiers
 
@@ -58,7 +61,7 @@ praxis uses a three-tier stability model to communicate what callers can rely on
 
 **Frozen (v1.0)** -- These interfaces will not change in any v1.x release. All interfaces listed in the v1.0 surface table above are frozen. Adding methods to a frozen interface requires a new major version. Callers can depend on these for production use without risk of breakage during minor or patch upgrades.
 
-**Stable (v0.x candidate)** -- These packages have settled APIs that are expected to be promoted to frozen in a future minor release. Breaking changes are possible but will be communicated in release notes with a migration path. Sub-packages like `telemetry/slog` and `telemetry/metrics` fall into this tier.
+**Stable (v0.x candidate)** -- These packages have settled APIs that are expected to be promoted to frozen in a future minor release. Breaking changes are possible but will be communicated in release notes with a migration path. The `mcp` and `skills` sub-modules are in this tier on their own SemVer tracks (`praxis/mcp/v0.7.x`, `praxis/skills/v0.9.x`); sub-packages like `telemetry/slog` and `telemetry/metrics` also fall into this tier.
 
 **Post-v1** -- Packages or interfaces introduced after the v1.0 release. These follow standard semantic versioning: they may change in minor releases until explicitly promoted to frozen. New packages will be clearly marked in their documentation.
 

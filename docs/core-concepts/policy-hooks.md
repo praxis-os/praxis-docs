@@ -50,6 +50,8 @@ sequenceDiagram
 
 :::note
 `PreLLMInput` and `PostToolOutput` fire through the filter chain interfaces (`PreLLMFilter` and `PostToolFilter`), not through `PolicyHook`. The `PolicyHook` handles `PreInvocation` and `PostInvocation`. This separation exists because filters need fine-grained per-field control (redact, pass) while lifecycle hooks make coarse-grained decisions (allow, deny).
+
+`PostToolFilter` applies uniformly to native `tools.Invoker` results and to results emitted by an [`mcp.Invoker`](../api-reference/mcp.md), since both cross the same seam. MCP output is classified as untrusted (D116) — register a filter when wiring an MCP server.
 :::
 
 ## PolicyHook Interface

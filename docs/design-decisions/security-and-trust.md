@@ -3,10 +3,10 @@ title: "Security & Trust"
 description: "Key design decisions on praxis security: credential zeroing, Ed25519 reference implementation, untrusted tool output model, filter trust boundaries, and security invariants."
 sidebar_label: "Security & Trust"
 sidebar_position: 6
-keywords: [security, credentials, zeroing, Ed25519, trust-boundary, PostToolFilter, untrusted, invariants, D67, D73, D77, D78, D80]
+keywords: [security, credentials, zeroing, Ed25519, trust-boundary, PostToolFilter, untrusted, invariants, mcp, D67, D73, D77, D78, D80, D116]
 rag_section: "design-decisions"
-rag_packages: ["credentials", "identity", "hooks"]
-rag_interfaces: ["credentials.Resolver", "identity.Signer", "hooks.PostToolFilter"]
+rag_packages: ["credentials", "identity", "hooks", "mcp"]
+rag_interfaces: ["credentials.Resolver", "identity.Signer", "hooks.PostToolFilter", "mcp.Invoker"]
 rag_difficulty: "advanced"
 ---
 
@@ -46,6 +46,17 @@ Filters are classified by trust boundary position:
 | `PostToolFilter` | External tool output | Untrusted | Filter errors may indicate injection attempts |
 
 This distinction affects error severity: a `PostToolFilter` error on untrusted input is treated as more critical than a `PreLLMFilter` error on framework-controlled input. Security monitoring should prioritize `PostToolFilter` blocks and errors.
+
+## D116: MCP Output Trust Boundary
+
+The `praxis/mcp` sub-module classifies the MCP transport edge as a Phase 5 untrusted-output boundary equivalent to D77. MCP servers are separate processes (stdio) or remote services (Streamable HTTP), often operated by third parties; their `ToolResult.Content` is transitively untrusted regardless of which transport carries it.
+
+Two consequences follow from this classification:
+
+1. **PostToolFilter is mandatory in practice.** All MCP results must pass `PostToolFilter` before reuse. The framework does not introduce a new MCP-specific filter tier; the existing D77/D78 contracts apply uniformly to MCP `tools.Invoker` results.
+2. **Content flattening is defence in depth, not a substitute.** MCP responses are flattened to text-only blocks joined by `\n\n` (D114) before the result reaches the filter chain. This shrinks the attack surface but does not sanitise the content; filters remain the authoritative inspection point.
+
+`SignedIdentity` JWTs are **not** forwarded to MCP servers (D118). If an MCP call needs a downstream identity assertion, inject it as a credential through `CredentialRef` and `credentials.Resolver` so the standard zeroing contract (D67) applies.
 
 ## D80: Twenty-Six Security Invariants
 
