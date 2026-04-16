@@ -3,9 +3,9 @@ title: "Provider Abstraction"
 description: "The llm.Provider interface decouples praxis orchestration from any specific LLM vendor, enabling provider-agnostic agent orchestration with typed error classification and structured retries."
 sidebar_label: "Provider Abstraction"
 sidebar_position: 3
-keywords: [praxis, llm, provider, anthropic, openai, abstraction, adapter, error-classification, streaming, LLMRequest, LLMResponse]
+keywords: [praxis, llm, provider, anthropic, openai, gemini, groq, ollama, openrouter, abstraction, adapter, error-classification, streaming, LLMRequest, LLMResponse]
 rag_section: "core-concepts"
-rag_packages: ["llm", "llm/anthropic"]
+rag_packages: ["llm", "llm/anthropic", "llm/openai", "llm/gemini", "llm/groq", "llm/ollama", "llm/openrouter"]
 rag_interfaces: ["llm.Provider"]
 rag_difficulty: "intermediate"
 ---
@@ -97,12 +97,16 @@ The `llm` package defines the canonical message types. Provider adapters are res
 
 ## Shipped Adapters
 
-praxis ships with production-ready adapters for major LLM providers.
+praxis ships with six production-ready adapters. Three have native implementations; three are thin wrappers over the OpenAI adapter using its composability options.
 
-| Adapter | Package | Status | Notes |
-|---------|---------|--------|-------|
-| Anthropic Claude | `llm/anthropic` | Available | Supports Claude model family, parallel tool calls, streaming |
-| OpenAI | `llm/openai` | Available | GPT-4o and successors, stdlib-only HTTP transport |
+| Adapter | Package | Type | Auth | Notes |
+|---------|---------|------|------|-------|
+| Anthropic Claude | `llm/anthropic` | Native | Header (`x-api-key`) | Reference impl, parallel tool calls, streaming |
+| OpenAI | `llm/openai` | Native | Bearer token | GPT-4o and successors, stdlib-only HTTP |
+| Google Gemini | `llm/gemini` | Native | Query param (`?key=`) | Full request/response mapping, 1M context |
+| OpenRouter | `llm/openrouter` | Thin wrapper | Bearer token + custom headers | Multi-model gateway |
+| Groq | `llm/groq` | Thin wrapper | Bearer token | Fast inference |
+| Ollama | `llm/ollama` | Thin wrapper | None (local) | Local model serving |
 
 ### Anthropic Adapter
 
@@ -141,10 +145,104 @@ Available options:
 | `WithDefaultModel(model)` | Default model when `LLMRequest.Model` is empty. Default: `"gpt-4o"`. |
 | `WithBaseURL(url)` | Override the API base URL. Useful for Azure OpenAI or proxies. Default: `"https://api.openai.com"`. |
 | `WithHTTPClient(c)` | Replace the default `http.Client` for API requests. |
+| `WithName(name)` | Override provider name for telemetry and budget lookups. Default: `"openai"`. |
+| `WithExtraHeaders(headers)` | Add custom HTTP headers to every API request. |
+| `WithCapabilities(caps)` | Override default capabilities snapshot. |
 
 :::note
 The OpenAI provider does not yet implement native streaming. `Stream()` delegates to `Complete()` and delivers the result as a single final chunk.
 :::
+
+### Gemini Adapter
+
+The Gemini adapter is a full native implementation with its own request/response mapping to the `generateContent` endpoint. It handles Gemini's unique API conventions: API key as query parameter, `"model"` role for assistant messages, and synthetic tool call IDs.
+
+```go title="Creating a Gemini provider"
+import "github.com/praxis-os/praxis/llm/gemini"
+
+provider := gemini.New(os.Getenv("GEMINI_API_KEY"),
+    gemini.WithDefaultModel("gemini-2.0-flash"),
+)
+```
+
+Available options:
+
+| Option | Description |
+|---|---|
+| `WithDefaultModel(model)` | Default model. Default: `"gemini-2.0-flash"`. |
+| `WithBaseURL(url)` | Override API base URL. Default: `"https://generativelanguage.googleapis.com"`. |
+| `WithHTTPClient(c)` | Replace the default `http.Client`. |
+
+The adapter reports `MaxContextTokens: 1048576` (1M tokens) and `SupportsParallelToolCalls: true`.
+
+### OpenRouter Adapter
+
+OpenRouter is a thin wrapper over `openai.Provider` that configures the OpenRouter base URL and adds app identification headers.
+
+```go title="Creating an OpenRouter provider"
+import "github.com/praxis-os/praxis/llm/openrouter"
+
+provider := openrouter.New(os.Getenv("OPENROUTER_API_KEY"),
+    openrouter.WithModel("anthropic/claude-sonnet-4-20250514"),
+)
+```
+
+Available options:
+
+| Option | Description |
+|---|---|
+| `WithModel(model)` | Default model. Default: `"anthropic/claude-sonnet-4-20250514"`. |
+| `WithReferer(url)` | Sets `HTTP-Referer` header for app identification. |
+| `WithTitle(title)` | Sets `X-Title` header for dashboard identification. |
+
+### Groq Adapter
+
+Groq is a thin wrapper over `openai.Provider` configured for the Groq inference API.
+
+```go title="Creating a Groq provider"
+import "github.com/praxis-os/praxis/llm/groq"
+
+provider := groq.New(os.Getenv("GROQ_API_KEY"),
+    groq.WithModel("llama-3.3-70b-versatile"),
+)
+```
+
+Available options:
+
+| Option | Description |
+|---|---|
+| `WithModel(model)` | Default model. Default: `"llama-3.3-70b-versatile"`. |
+
+### Ollama Adapter
+
+Ollama is a thin wrapper over `openai.Provider` for local model serving. No API key required.
+
+```go title="Creating an Ollama provider"
+import "github.com/praxis-os/praxis/llm/ollama"
+
+provider := ollama.New(
+    ollama.WithModel("llama3.2"),
+)
+```
+
+Available options:
+
+| Option | Description |
+|---|---|
+| `WithModel(model)` | Default model. Default: `"llama3.2"`. |
+| `WithBaseURL(url)` | Override base URL. Default: `"http://localhost:11434"`. |
+
+The adapter uses conservative capability defaults for local models: `SupportsParallelToolCalls: false`, `SupportsStreaming: false`, `MaxContextTokens: 8192`.
+
+### Thin Wrapper Architecture
+
+OpenRouter, Groq, and Ollama all return `*openai.Provider` -- they leverage three composability options added to the OpenAI adapter in v0.11.0:
+
+- **`WithName(name)`** overrides the canonical provider name used in telemetry and budget lookups
+- **`WithExtraHeaders(headers)`** injects custom HTTP headers (used by OpenRouter for `HTTP-Referer` and `X-Title`)
+- **`WithCapabilities(caps)`** overrides default capability values (used by Ollama to disable parallel tool calls and reduce context window)
+
+This pattern makes it trivial to add new OpenAI-compatible providers: configure base URL, name, headers, and capabilities, then expose provider-specific options.
 
 ## Error Classification
 

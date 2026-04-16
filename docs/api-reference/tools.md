@@ -31,6 +31,32 @@ The package also defines `InvocationContext`, a read-only container that gives t
 
 For Model Context Protocol servers, use the [`mcp` package](./mcp.md), which implements `tools.Invoker` over stdio and Streamable HTTP transports.
 
+## Struct Field Reference
+
+### ToolCall
+
+| Field | Type | Description |
+|---|---|---|
+| `Name` | `string` | Tool name as specified by the LLM. |
+| `ID` | `string` | Unique identifier for this tool call. Used for correlation in events and telemetry. |
+| `Arguments` | `string` | JSON-encoded arguments from the LLM. |
+
+### ToolResult
+
+| Field | Type | Description |
+|---|---|---|
+| `Status` | `ToolStatus` | Terminal status: `StatusSuccess`, `StatusError`, or `StatusDenied`. |
+| `Content` | `string` | Tool output content. Passed back to the LLM as the tool response. |
+| `Error` | `string` | Error message when `Status` is `StatusError`. Passed to the LLM for self-correction. |
+
+### InvocationContext
+
+| Field | Type | Description |
+|---|---|---|
+| `InvocationID` | `string` | Unique identifier for the current invocation. Use for log correlation. |
+| `BudgetSnapshot` | `budget.BudgetSnapshot` | Current resource consumption. Tools can make cost-aware decisions. |
+| `IdentityToken` | `string` | JWT identity token for downstream authentication. See [identity package](./identity.md). |
+
 ## Usage Patterns
 
 ### Implementing an Invoker

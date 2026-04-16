@@ -75,6 +75,10 @@ const sidebars: SidebarsConfig = {
         'examples/mcp-stdio',
         'examples/mcp-http',
         'examples/skills',
+        'examples/gemini',
+        'examples/openrouter',
+        'examples/groq',
+        'examples/ollama',
       ],
     },
     {

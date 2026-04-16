@@ -33,6 +33,28 @@ The following table is the complete set of public interfaces that define the v1.
 | `credentials` | `Resolver` | Per-call credential fetch with zeroing. |
 | `identity` | `Signer` | Per-tool-call Ed25519 JWT identity assertion. |
 
+## Type Index
+
+The following table lists all major value types across packages, with links to their detailed field documentation.
+
+| Type | Package | Kind | Documented In |
+|---|---|---|---|
+| `InvocationRequest` | `orchestrator` | Struct | [orchestrator](./orchestrator.md) |
+| `InvocationResult` | `orchestrator` | Struct | [orchestrator](./orchestrator.md) |
+| `LLMRequest` | `llm` | Struct | [llm](./llm.md) |
+| `LLMResponse` | `llm` | Struct | [llm](./llm.md) |
+| `Message` | `llm` | Struct | [llm](./llm.md) |
+| `MessagePart` | `llm` | Struct | [llm](./llm.md) |
+| `ToolCall` | `tools` | Struct | [tools](./tools.md) |
+| `ToolResult` | `tools` | Struct | [tools](./tools.md) |
+| `InvocationContext` | `tools` | Struct | [tools](./tools.md) |
+| `Decision` | `hooks` | Struct | [hooks](./hooks.md) |
+| `FilterDecision` | `hooks` | Struct | [hooks](./hooks.md) |
+| `PolicyInput` | `hooks` | Struct | [hooks](./hooks.md) |
+| `ToolOutput` | `hooks` | Struct | [hooks](./hooks.md) |
+| `BudgetSnapshot` | `budget` | Value type | [budget](./budget.md) |
+| `InvocationEvent` | `event` | Struct | [event](./event.md) |
+
 ## Package Map
 
 Most public packages live under the root `github.com/praxis-os/praxis` Go module. Two packages — `mcp` and `skills` — are **independently versioned Go sub-modules** with their own `go.mod`. You add them separately (`go get github.com/praxis-os/praxis/mcp@v0.7.x`, `go get github.com/praxis-os/praxis/skills@v0.9.x`) so they can evolve without forcing a root minor bump.

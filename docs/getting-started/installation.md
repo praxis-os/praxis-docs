@@ -3,9 +3,9 @@ title: "Installation"
 description: "How to install the praxis Go library, set up prerequisites, and configure LLM provider credentials."
 sidebar_label: "Installation"
 sidebar_position: 2
-keywords: [install, go-get, prerequisites, go-1.23, anthropic-api-key, setup]
+keywords: [install, go-get, prerequisites, go-1.26, anthropic-api-key, openai, gemini, groq, ollama, openrouter, setup]
 rag_section: "getting-started"
-rag_packages: ["llm/anthropic"]
+rag_packages: ["llm/anthropic", "llm/openai", "llm/gemini", "llm/groq", "llm/ollama", "llm/openrouter"]
 rag_interfaces: []
 rag_difficulty: "beginner"
 ---
@@ -16,8 +16,8 @@ praxis is a standard Go module. This page covers prerequisites, installation, an
 
 ## Prerequisites
 
-- **Go 1.23** or later
-- An LLM provider API key (Anthropic is the shipped adapter)
+- **Go 1.26** or later
+- An API key for at least one supported LLM provider
 
 ## Install the module
 
@@ -31,10 +31,26 @@ This pulls the core library and all sub-packages (`orchestrator`, `llm`, `tools`
 
 ## Configure your LLM provider
 
-praxis ships with an Anthropic adapter. Set your API key as an environment variable:
+praxis ships with six provider adapters. Set the API key for your chosen provider:
 
 ```bash title="terminal"
+# Anthropic Claude
 export ANTHROPIC_API_KEY=sk-ant-...
+
+# OpenAI
+export OPENAI_API_KEY=sk-...
+
+# Google Gemini
+export GEMINI_API_KEY=AI...
+
+# OpenRouter
+export OPENROUTER_API_KEY=sk-or-...
+
+# Groq
+export GROQ_API_KEY=gsk_...
+
+# Ollama (local, no API key needed)
+# Just ensure Ollama is running: ollama serve
 ```
 
 :::tip
@@ -81,6 +97,11 @@ The `go get` command installs the full praxis module. Key packages:
 | `orchestrator` | Public facade for creating and running invocations |
 | `llm` | Provider-agnostic LLM abstraction |
 | `llm/anthropic` | Anthropic Claude adapter |
+| `llm/openai` | OpenAI adapter (also base for thin wrappers) |
+| `llm/gemini` | Google Gemini adapter (native implementation) |
+| `llm/openrouter` | OpenRouter adapter (thin wrapper over openai) |
+| `llm/groq` | Groq adapter (thin wrapper over openai) |
+| `llm/ollama` | Ollama local models adapter (thin wrapper over openai) |
 | `tools` | Tool execution interface |
 | `hooks` | Policy hooks and filter chains |
 | `budget` | Multi-dimensional budget enforcement |

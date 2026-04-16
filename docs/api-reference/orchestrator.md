@@ -27,6 +27,26 @@ The orchestrator coordinates every subsystem -- LLM provider, policy hooks, budg
 | `InvocationRequest` | Struct | Input to `Invoke` and `InvokeStream`. Contains messages, tool definitions, and per-call overrides. |
 | `InvocationResult` | Struct | Output of a completed invocation. Contains the final message, token usage, budget snapshot, and terminal state. |
 
+## Struct Field Reference
+
+### InvocationRequest
+
+| Field | Type | Description |
+|---|---|---|
+| `Messages` | `[]llm.Message` | Conversation history including system prompt and user messages. |
+| `Model` | `string` | Model identifier override. Empty string uses the provider default. |
+| `Tools` | `[]tools.ToolDefinition` | Tool definitions available for this invocation. |
+| `Metadata` | `map[string]string` | Caller-supplied key-value pairs propagated to policy hooks and telemetry. |
+
+### InvocationResult
+
+| Field | Type | Description |
+|---|---|---|
+| `Message` | `llm.Message` | The final assistant message. |
+| `TerminalState` | `state.State` | The terminal state reached (e.g., `Completed`, `Failed`, `BudgetExceeded`). |
+| `BudgetSnapshot` | `budget.BudgetSnapshot` | Resource consumption at completion. |
+| `Error` | `error` | Non-nil if the invocation failed. Contains a `TypedError` with error kind and context. |
+
 ## Usage Patterns
 
 ### Construction with Functional Options

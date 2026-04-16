@@ -29,6 +29,17 @@ The package defines two interfaces. `Guard` tracks consumption and checks limits
 | `NullGuard` | Struct | Default guard that never enforces limits. All checks return within budget. |
 | `NullPriceProvider` | Struct | Default price provider that returns zero cost for all queries. |
 
+## Struct Field Reference
+
+### BudgetSnapshot
+
+| Field | Type | Description |
+|---|---|---|
+| `TokensUsed` | `int` | Total tokens consumed (input + output). |
+| `CostMicros` | `int64` | Estimated cost in micro-dollars (millionths of a dollar). |
+| `ToolCallCount` | `int` | Number of tool calls executed so far. |
+| `Elapsed` | `time.Duration` | Wall-clock time since invocation start. |
+
 ## Usage Patterns
 
 ### Configuring a Budget Guard

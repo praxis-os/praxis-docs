@@ -3,9 +3,9 @@ title: "llm Package"
 description: "The llm package defines the provider-agnostic abstraction layer that lets praxis work with any LLM backend through a single typed interface."
 sidebar_label: "llm"
 sidebar_position: 3
-keywords: [praxis, llm, provider, complete, stream, message, anthropic, openai, abstraction, model, capabilities]
+keywords: [praxis, llm, provider, complete, stream, message, anthropic, openai, gemini, groq, ollama, openrouter, abstraction, model, capabilities]
 rag_section: "api-reference"
-rag_packages: ["llm", "llm/anthropic", "llm/openai"]
+rag_packages: ["llm", "llm/anthropic", "llm/openai", "llm/gemini", "llm/groq", "llm/ollama", "llm/openrouter"]
 rag_interfaces: ["llm.Provider"]
 rag_difficulty: "intermediate"
 ---
@@ -16,7 +16,7 @@ rag_difficulty: "intermediate"
 
 The `llm` package defines the abstraction boundary between praxis and any LLM backend. Rather than coding against a specific provider's SDK, callers and framework internals program against the `Provider` interface. This makes it possible to swap providers, add new ones, or build test doubles without changing orchestration logic.
 
-The package ships two production implementations: `anthropic.Provider` in `llm/anthropic` and `openai.Provider` in `llm/openai`. Adding support for a new provider means implementing four methods on the `Provider` interface.
+The package ships six production implementations: `anthropic.Provider`, `openai.Provider`, `gemini.Provider` (native), plus three thin wrappers over `openai.Provider` for OpenRouter, Groq, and Ollama. Adding support for a new provider means implementing four methods on the `Provider` interface -- or wrapping `openai.Provider` if the target uses an OpenAI-compatible API.
 
 ## Key Interfaces and Types
 
@@ -30,6 +30,42 @@ The package ships two production implementations: `anthropic.Provider` in `llm/a
 | `MessagePart` | Struct | A typed content fragment within a message. The `Type` field determines which payload field is populated. |
 | `Role` | String type | One of `RoleUser`, `RoleAssistant`, or `RoleSystem`. |
 | `PartType` | String type | Content type discriminator. `PartTypeText` is the most common. |
+
+## Struct Field Reference
+
+### LLMRequest
+
+| Field | Type | Description |
+|---|---|---|
+| `Messages` | `[]Message` | Conversation messages to send to the provider. |
+| `Model` | `string` | Model identifier (e.g., `"claude-sonnet-4-20250514"`). Empty string uses the provider default. |
+| `Tools` | `[]ToolDefinition` | Tool definitions for function calling. |
+| `MaxTokens` | `int` | Maximum tokens in the response. Zero uses the provider default. |
+| `Temperature` | `*float64` | Sampling temperature. `nil` uses the provider default. |
+| `StopSequences` | `[]string` | Sequences that halt generation. |
+
+### LLMResponse
+
+| Field | Type | Description |
+|---|---|---|
+| `Message` | `Message` | The assistant's response message. |
+| `InputTokens` | `int` | Tokens consumed by the input. |
+| `OutputTokens` | `int` | Tokens in the generated response. |
+| `Model` | `string` | Model that actually served the request (may differ from the requested model). |
+
+### Message
+
+| Field | Type | Description |
+|---|---|---|
+| `Role` | `Role` | One of `RoleUser`, `RoleAssistant`, `RoleSystem`. |
+| `Parts` | `[]MessagePart` | Content fragments within the message. |
+
+### MessagePart
+
+| Field | Type | Description |
+|---|---|---|
+| `Type` | `PartType` | Content type discriminator (e.g., `PartTypeText`). |
+| `Text` | `string` | Text content. Populated when `Type` is `PartTypeText`. |
 
 ## Usage Patterns
 
@@ -94,10 +130,72 @@ Available options:
 | `WithDefaultModel(model)` | Default model when `LLMRequest.Model` is empty. Default: `"gpt-4o"`. |
 | `WithBaseURL(url)` | Override the API base URL. Useful for Azure OpenAI or proxies. Default: `"https://api.openai.com"`. |
 | `WithHTTPClient(c)` | Replace the default `http.Client` for API requests. |
+| `WithName(name)` | Override provider name for telemetry and budget lookups. Default: `"openai"`. |
+| `WithExtraHeaders(headers)` | Add custom HTTP headers to every API request. |
+| `WithCapabilities(caps)` | Override default capabilities. Used by thin wrappers to set provider-specific limits. |
 
 :::note
 The OpenAI provider does not yet implement native streaming. `Stream()` delegates to `Complete()` and delivers the result as a single final chunk.
 :::
+
+### Using the Gemini Provider
+
+The `llm/gemini` sub-package provides a native implementation for Google's Gemini API. It handles API key authentication via query parameter, request mapping to the `generateContent` endpoint, and synthetic tool call ID generation.
+
+```go title="Creating the Gemini provider"
+import "github.com/praxis-os/praxis/llm/gemini"
+
+provider := gemini.New(os.Getenv("GEMINI_API_KEY"),
+    gemini.WithDefaultModel("gemini-2.0-flash"),
+)
+```
+
+Available options:
+
+| Option | Description |
+|---|---|
+| `WithDefaultModel(model)` | Default model. Default: `"gemini-2.0-flash"`. |
+| `WithBaseURL(url)` | Override API base URL. Default: `"https://generativelanguage.googleapis.com"`. |
+| `WithHTTPClient(c)` | Replace the default `http.Client`. |
+
+### Using the OpenRouter Provider
+
+The `llm/openrouter` sub-package wraps `openai.Provider` for the OpenRouter multi-model gateway.
+
+```go title="Creating the OpenRouter provider"
+import "github.com/praxis-os/praxis/llm/openrouter"
+
+provider := openrouter.New(os.Getenv("OPENROUTER_API_KEY"),
+    openrouter.WithModel("anthropic/claude-sonnet-4-20250514"),
+    openrouter.WithReferer("https://myapp.example.com"),
+    openrouter.WithTitle("My App"),
+)
+```
+
+### Using the Groq Provider
+
+The `llm/groq` sub-package wraps `openai.Provider` for the Groq inference API.
+
+```go title="Creating the Groq provider"
+import "github.com/praxis-os/praxis/llm/groq"
+
+provider := groq.New(os.Getenv("GROQ_API_KEY"),
+    groq.WithModel("llama-3.3-70b-versatile"),
+)
+```
+
+### Using the Ollama Provider
+
+The `llm/ollama` sub-package wraps `openai.Provider` for local Ollama model serving. No API key needed.
+
+```go title="Creating the Ollama provider"
+import "github.com/praxis-os/praxis/llm/ollama"
+
+provider := ollama.New(
+    ollama.WithModel("llama3.2"),
+    ollama.WithBaseURL("http://localhost:11434"),
+)
+```
 
 ### Test Doubles
 

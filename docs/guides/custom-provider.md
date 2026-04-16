@@ -12,7 +12,7 @@ rag_difficulty: "advanced"
 
 # Building a Custom LLM Provider
 
-praxis ships with an Anthropic adapter, but the `llm.Provider` interface is designed for straightforward implementation against any LLM backend. This guide walks through building a complete custom provider from scratch, covering the four required methods, error classification, streaming support, and testing.
+praxis ships with six adapters (Anthropic, OpenAI, Gemini, OpenRouter, Groq, Ollama), but the `llm.Provider` interface is designed for straightforward implementation against any LLM backend. This guide walks through building a complete custom provider from scratch, covering the four required methods, error classification, streaming support, and testing. If your target uses an OpenAI-compatible API, see [Thin Wrapper Shortcut](#thin-wrapper-shortcut) at the end of this page.
 
 ## Implementing the Interface
 
@@ -300,5 +300,41 @@ The test pattern follows a conformance suite approach: test each error classific
 :::tip
 Use `httptest.NewServer` to create mock HTTP backends. This lets you test the full request/response cycle without hitting a real API. Test both the happy path and every error classification boundary.
 :::
+
+## Thin Wrapper Shortcut
+
+If your target provider exposes an OpenAI-compatible Chat Completions API, you do not need a full `Provider` implementation. Instead, wrap `openai.Provider` using three composability options added in v0.11.0:
+
+```go title="mycloud/provider.go"
+package mycloud
+
+import (
+    "github.com/praxis-os/praxis/llm"
+    "github.com/praxis-os/praxis/llm/openai"
+)
+
+func New(apiKey string) *openai.Provider {
+    return openai.New(apiKey,
+        openai.WithBaseURL("https://api.mycloud.ai/v1"),
+        openai.WithName("mycloud"),
+        openai.WithDefaultModel("mycloud-large"),
+        openai.WithCapabilities(llm.Capabilities{
+            SupportsParallelToolCalls: true,
+            SupportsStreaming:         false,
+            MaxContextTokens:         32768,
+        }),
+    )
+}
+```
+
+This is the same pattern used by the shipped OpenRouter, Groq, and Ollama adapters. The wrapper returns `*openai.Provider` directly -- no new type needed unless you want provider-specific option functions.
+
+Key composability options:
+
+| Option | Purpose |
+|---|---|
+| `WithName(name)` | Overrides provider name in telemetry spans and budget price lookups |
+| `WithExtraHeaders(headers)` | Injects custom HTTP headers (e.g., app identification) |
+| `WithCapabilities(caps)` | Overrides default capability snapshot (context window, parallel tools, streaming) |
 
 For the full `llm.Provider` API surface, see [pkg.go.dev/github.com/praxis-os/praxis/llm](https://pkg.go.dev/github.com/praxis-os/praxis/llm).
