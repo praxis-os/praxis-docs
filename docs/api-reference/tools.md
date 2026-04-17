@@ -25,9 +25,9 @@ The package also defines `InvocationContext`, a read-only container that gives t
 | `Invoker` | Interface | Executes a tool call and returns a result. Single method: `InvokeTool`. |
 | `ToolCall` | Struct | Describes a tool invocation requested by the LLM. Contains name, ID, and JSON arguments. |
 | `ToolResult` | Struct | The outcome of a tool execution. Contains output content, status, and optional error. |
-| `ToolStatus` | Enum | Terminal status of a tool call: `StatusSuccess`, `StatusError`, `StatusDenied`. |
+| `ToolStatus` | Enum | Terminal status: `ToolStatusSuccess`, `ToolStatusDenied`, `ToolStatusNotImplemented`, `ToolStatusError`. |
 | `InvocationContext` | Struct | Read-only container for framework state passed to tools. Includes invocation ID, budget snapshot, identity token. |
-| `NullInvoker` | Struct | Default invoker that returns `StatusDenied` for every tool call. |
+| `NullInvoker` | Struct | Default invoker that returns `ToolStatusNotImplemented` for every tool call. |
 
 For Model Context Protocol servers, use the [`mcp` package](./mcp.md), which implements `tools.Invoker` over stdio and Streamable HTTP transports.
 
@@ -37,25 +37,30 @@ For Model Context Protocol servers, use the [`mcp` package](./mcp.md), which imp
 
 | Field | Type | Description |
 |---|---|---|
-| `Name` | `string` | Tool name as specified by the LLM. |
-| `ID` | `string` | Unique identifier for this tool call. Used for correlation in events and telemetry. |
-| `Arguments` | `string` | JSON-encoded arguments from the LLM. |
+| `CallID` | `string` | Unique identifier assigned by the LLM. Echoed back in `ToolResult.CallID` for correlation. |
+| `Name` | `string` | Tool name as declared in the `ToolDefinition`. |
+| `ArgumentsJSON` | `[]byte` | Raw JSON arguments produced by the LLM. Parse into your tool's argument struct. |
 
 ### ToolResult
 
 | Field | Type | Description |
 |---|---|---|
-| `Status` | `ToolStatus` | Terminal status: `StatusSuccess`, `StatusError`, or `StatusDenied`. |
-| `Content` | `string` | Tool output content. Passed back to the LLM as the tool response. |
-| `Error` | `string` | Error message when `Status` is `StatusError`. Passed to the LLM for self-correction. |
+| `Status` | `ToolStatus` | `ToolStatusSuccess`, `ToolStatusDenied`, `ToolStatusNotImplemented`, or `ToolStatusError`. |
+| `Content` | `string` | Tool output presented to the LLM on the next turn. |
+| `Err` | `error` | Typed error from the invocation. May be non-nil even when `Status` is `ToolStatusSuccess` (e.g., nested-invocation errors that were handled). |
+| `CallID` | `string` | Echo of the `ToolCall.CallID`. |
 
 ### InvocationContext
 
+Read-only ambient state passed to `Invoker.InvokeTool`. Used for budget-aware decisions, tracing, and identity propagation.
+
 | Field | Type | Description |
 |---|---|---|
-| `InvocationID` | `string` | Unique identifier for the current invocation. Use for log correlation. |
-| `BudgetSnapshot` | `budget.BudgetSnapshot` | Current resource consumption. Tools can make cost-aware decisions. |
-| `IdentityToken` | `string` | JWT identity token for downstream authentication. See [identity package](./identity.md). |
+| `Metadata` | `map[string]string` | Caller-supplied key-value pairs from `InvocationRequest.Metadata`. |
+| `Budget` | `budget.BudgetSnapshot` | Current resource consumption. |
+| `InvocationID` | `string` | Unique identifier for the current invocation. |
+| `SignedIdentity` | `string` | Ed25519-signed JWT identity for downstream authentication. See [identity package](./identity.md). |
+| `SpanContext` | `trace.SpanContext` | OpenTelemetry span context for child span creation. |
 
 ## Usage Patterns
 
@@ -69,18 +74,26 @@ type MyInvoker struct{}
 func (i *MyInvoker) InvokeTool(ctx context.Context, call tools.ToolCall, ic tools.InvocationContext) (tools.ToolResult, error) {
     switch call.Name {
     case "get_weather":
-        result, err := fetchWeather(ctx, call.Arguments)
+        result, err := fetchWeather(ctx, call.ArgumentsJSON)
         if err != nil {
-            return tools.ToolResult{Status: tools.StatusError, Error: err.Error()}, nil
+            return tools.ToolResult{
+                Status: tools.ToolStatusError,
+                Err:    err,
+                CallID: call.CallID,
+            }, nil
         }
-        return tools.ToolResult{Status: tools.StatusSuccess, Content: result}, nil
+        return tools.ToolResult{
+            Status:  tools.ToolStatusSuccess,
+            Content: result,
+            CallID:  call.CallID,
+        }, nil
     default:
-        return tools.ToolResult{Status: tools.StatusDenied}, nil
+        return tools.ToolResult{Status: tools.ToolStatusNotImplemented, CallID: call.CallID}, nil
     }
 }
 ```
 
-Return a `ToolResult` with `StatusError` for domain-level failures (e.g., API returned 404). Return a Go error for infrastructure-level failures (e.g., network timeout). The orchestrator classifies Go errors through the error taxonomy; `ToolResult` errors are passed back to the LLM as tool output.
+Return a `ToolResult` with `ToolStatusError` for domain-level failures (e.g., API returned 404). Return a Go error for infrastructure-level failures (e.g., network timeout). The orchestrator classifies Go errors through the error taxonomy; `ToolResult` errors are passed back to the LLM as tool output.
 
 ### Using InvocationContext
 
@@ -88,8 +101,8 @@ Return a `ToolResult` with `StatusError` for domain-level failures (e.g., API re
 
 ```go title="Accessing invocation context"
 func (i *MyInvoker) InvokeTool(ctx context.Context, call tools.ToolCall, ic tools.InvocationContext) (tools.ToolResult, error) {
-    log.Printf("invocation=%s tool=%s budget_remaining=%d",
-        ic.InvocationID, call.Name, ic.BudgetSnapshot.RemainingTokens)
+    log.Printf("invocation=%s tool=%s in_tokens_used=%d",
+        ic.InvocationID, call.Name, ic.Budget.InputTokensUsed)
     // ...
 }
 ```
@@ -100,15 +113,24 @@ A powerful pattern in praxis is registering another `Orchestrator` as a tool. Th
 
 ```go title="Agent-as-tool pattern"
 func (i *AgentToolInvoker) InvokeTool(ctx context.Context, call tools.ToolCall, ic tools.InvocationContext) (tools.ToolResult, error) {
-    innerResult, err := i.innerOrch.Invoke(ctx, orchestrator.InvocationRequest{
+    innerResult, err := i.innerOrch.Invoke(ctx, praxis.InvocationRequest{
         Messages: []llm.Message{
-            {Role: llm.RoleUser, Parts: []llm.MessagePart{{Type: llm.PartTypeText, Text: call.Arguments}}},
+            {Role: llm.RoleUser, Parts: []llm.MessagePart{llm.TextPart(string(call.ArgumentsJSON))}},
         },
+        ParentToken: ic.SignedIdentity,
     })
     if err != nil {
-        return tools.ToolResult{Status: tools.StatusError, Error: err.Error()}, nil
+        return tools.ToolResult{Status: tools.ToolStatusError, Err: err, CallID: call.CallID}, nil
     }
-    return tools.ToolResult{Status: tools.StatusSuccess, Content: innerResult.Message.Text()}, nil
+    var content string
+    if innerResult.Response != nil {
+        for _, p := range innerResult.Response.Parts {
+            if p.Type == llm.PartTypeText {
+                content += p.Text
+            }
+        }
+    }
+    return tools.ToolResult{Status: tools.ToolStatusSuccess, Content: content, CallID: call.CallID}, nil
 }
 ```
 

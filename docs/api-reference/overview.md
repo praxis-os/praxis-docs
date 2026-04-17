@@ -39,21 +39,32 @@ The following table lists all major value types across packages, with links to t
 
 | Type | Package | Kind | Documented In |
 |---|---|---|---|
-| `InvocationRequest` | `orchestrator` | Struct | [orchestrator](./orchestrator.md) |
-| `InvocationResult` | `orchestrator` | Struct | [orchestrator](./orchestrator.md) |
+| `InvocationRequest` | `praxis` (root) | Struct | [orchestrator](./orchestrator.md) |
+| `InvocationResult` | `praxis` (root) | Struct | [orchestrator](./orchestrator.md) |
 | `LLMRequest` | `llm` | Struct | [llm](./llm.md) |
 | `LLMResponse` | `llm` | Struct | [llm](./llm.md) |
+| `TokenUsage` | `llm` | Struct | [llm](./llm.md) |
 | `Message` | `llm` | Struct | [llm](./llm.md) |
 | `MessagePart` | `llm` | Struct | [llm](./llm.md) |
 | `ToolCall` | `tools` | Struct | [tools](./tools.md) |
 | `ToolResult` | `tools` | Struct | [tools](./tools.md) |
+| `ToolStatus` | `tools` | Enum | [tools](./tools.md) |
 | `InvocationContext` | `tools` | Struct | [tools](./tools.md) |
-| `Decision` | `hooks` | Struct | [hooks](./hooks.md) |
-| `FilterDecision` | `hooks` | Struct | [hooks](./hooks.md) |
+| `PolicyHook` | `hooks` | Interface | [hooks](./hooks.md) |
+| `PreLLMFilter` | `hooks` | Interface | [hooks](./hooks.md) |
+| `PreToolFilter` | `hooks` | Interface | [hooks](./hooks.md) |
+| `PostToolFilter` | `hooks` | Interface | [hooks](./hooks.md) |
 | `PolicyInput` | `hooks` | Struct | [hooks](./hooks.md) |
-| `ToolOutput` | `hooks` | Struct | [hooks](./hooks.md) |
-| `BudgetSnapshot` | `budget` | Value type | [budget](./budget.md) |
+| `Decision` | `hooks` | Struct | [hooks](./hooks.md) |
+| `Phase` | `hooks` | Enum (4 values) | [hooks](./hooks.md) |
+| `Verdict` | `hooks` | Enum (5 values) | [hooks](./hooks.md) |
+| `FilterDecision` | `hooks` | Struct | [hooks](./hooks.md) |
+| `FilterAction` | `hooks` | Enum (4 values) | [hooks](./hooks.md) |
+| `BudgetSnapshot` | `budget` | Struct | [budget](./budget.md) |
+| `Config` | `budget` | Struct | [budget](./budget.md) |
+| `BudgetDimension` | `budget` | Enum | [budget](./budget.md) |
 | `InvocationEvent` | `event` | Struct | [event](./event.md) |
+| `EventType` | `event` | Enum (21 values) | [event](./event.md) |
 
 ## Package Map
 

@@ -33,12 +33,16 @@ The package defines two interfaces. `Guard` tracks consumption and checks limits
 
 ### BudgetSnapshot
 
+Point-in-time consumption across the four budget dimensions, plus the breach indicator.
+
 | Field | Type | Description |
 |---|---|---|
-| `TokensUsed` | `int` | Total tokens consumed (input + output). |
-| `CostMicros` | `int64` | Estimated cost in micro-dollars (millionths of a dollar). |
-| `ToolCallCount` | `int` | Number of tool calls executed so far. |
-| `Elapsed` | `time.Duration` | Wall-clock time since invocation start. |
+| `ElapsedWallClock` | `time.Duration` | Wall-clock time since invocation started. |
+| `InputTokensUsed` | `int64` | Cumulative input tokens consumed. |
+| `OutputTokensUsed` | `int64` | Cumulative output tokens generated. |
+| `ToolCallsUsed` | `int64` | Cumulative tool calls dispatched. |
+| `CostMicrodollars` | `int64` | Estimated cost in micro-dollars (1 USD = 1,000,000). |
+| `ExceededDimension` | `BudgetDimension` | Which dimension was breached, if any. Zero value (`""`) means no breach. |
 
 ## Usage Patterns
 
@@ -47,19 +51,22 @@ The package defines two interfaces. `Guard` tracks consumption and checks limits
 Pass a `Guard` implementation to the orchestrator via the `WithBudgetGuard` option. The guard receives consumption updates after each LLM call and tool execution.
 
 ```go title="Setting up budget enforcement"
-guard := budget.NewDefaultGuard(budget.Limits{
-    MaxDuration:   30 * time.Second,
-    MaxTokens:     50_000,
-    MaxToolCalls:  20,
-    MaxCostMicros: 500_000, // $0.50
+guard := budget.NewBudgetGuard(budget.Config{
+    MaxWallClock:        int64(30 * time.Second),
+    MaxInputTokens:      40_000,
+    MaxOutputTokens:     10_000,
+    MaxToolCalls:        20,
+    MaxCostMicrodollars: 500_000, // $0.50
 })
 
-orch := orchestrator.New(
+orch, err := orchestrator.New(
     provider,
     orchestrator.WithBudgetGuard(guard),
     orchestrator.WithPriceProvider(myPriceProvider),
 )
 ```
+
+Per-invocation overrides can be supplied through `InvocationRequest.BudgetConfig`.
 
 ### Implementing a PriceProvider
 
@@ -83,8 +90,9 @@ if err != nil {
     // handle
 }
 snap := result.BudgetSnapshot
-fmt.Printf("tokens_used=%d cost_micros=%d tool_calls=%d duration=%s\n",
-    snap.TokensUsed, snap.CostMicros, snap.ToolCallCount, snap.Elapsed)
+fmt.Printf("in=%d out=%d cost_micros=%d tool_calls=%d duration=%s\n",
+    snap.InputTokensUsed, snap.OutputTokensUsed, snap.CostMicrodollars,
+    snap.ToolCallsUsed, snap.ElapsedWallClock)
 ```
 
 ### Four-Dimensional Independence

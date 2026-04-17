@@ -29,23 +29,31 @@ The orchestrator coordinates every subsystem -- LLM provider, policy hooks, budg
 
 ## Struct Field Reference
 
+`InvocationRequest` and `InvocationResult` live in the root `praxis` package (not `orchestrator`). Import them as `praxis.InvocationRequest` / `praxis.InvocationResult`.
+
 ### InvocationRequest
 
 | Field | Type | Description |
 |---|---|---|
-| `Messages` | `[]llm.Message` | Conversation history including system prompt and user messages. |
-| `Model` | `string` | Model identifier override. Empty string uses the provider default. |
-| `Tools` | `[]tools.ToolDefinition` | Tool definitions available for this invocation. |
-| `Metadata` | `map[string]string` | Caller-supplied key-value pairs propagated to policy hooks and telemetry. |
+| `Metadata` | `map[string]string` | Caller-supplied key-value pairs propagated to `PolicyInput.Metadata` and telemetry attributes. |
+| `Model` | `string` | Model identifier override. Empty string falls back to the orchestrator default. |
+| `SystemPrompt` | `string` | System prompt for this invocation. Prepended as a system message. |
+| `ParentToken` | `string` | Signed identity token from the parent invocation (agent-as-tool composition). Empty for top-level calls. |
+| `Messages` | `[]llm.Message` | Conversation turns. Typically at least one user message. |
+| `Tools` | `[]llm.ToolDefinition` | Tool definitions exposed to the LLM for this invocation. |
+| `BudgetConfig` | `budget.Config` | Per-call budget limits (wall-clock, tokens, tool calls, cost). Zero values mean unlimited. |
+| `MaxTurns` | `int` | Maximum LLM turns before forced termination. Zero uses the orchestrator default. |
 
 ### InvocationResult
 
 | Field | Type | Description |
 |---|---|---|
-| `Message` | `llm.Message` | The final assistant message. |
-| `TerminalState` | `state.State` | The terminal state reached (e.g., `Completed`, `Failed`, `BudgetExceeded`). |
+| `Response` | `*llm.Message` | Final assistant message. `nil` on early termination before any LLM response. |
 | `BudgetSnapshot` | `budget.BudgetSnapshot` | Resource consumption at completion. |
-| `Error` | `error` | Non-nil if the invocation failed. Contains a `TypedError` with error kind and context. |
+| `InvocationID` | `string` | Unique identifier for this invocation. Stable across events and telemetry. |
+| `SignedIdentity` | `string` | Ed25519-signed JWT identity token for downstream propagation. Empty if no signer is configured. |
+| `Events` | `[]event.InvocationEvent` | Ordered lifecycle events (synchronous `Invoke` only; `InvokeStream` delivers via channel). |
+| `FinalState` | `state.State` | Terminal state reached (`Completed`, `Failed`, `BudgetExceeded`, `ApprovalRequired`, `Cancelled`). |
 
 ## Usage Patterns
 
@@ -54,26 +62,27 @@ The orchestrator coordinates every subsystem -- LLM provider, policy hooks, budg
 Create an `Orchestrator` by passing a required `llm.Provider` and zero or more `Option` values to `orchestrator.New`. Every dependency has a sensible default: `NullInvoker` for tools, `AllowAllPolicyHook` for policy, `NullGuard` for budget, and so on.
 
 ```go title="Minimal orchestrator construction"
-orch := orchestrator.New(
-    anthropicProvider,
-)
+orch, err := orchestrator.New(anthropicProvider)
 ```
 
-Override defaults by stacking options. Options are applied in order; later options win if they target the same dependency.
+`orchestrator.New` returns `(*Orchestrator, error)`. Override defaults by stacking options. Options are applied in order; later options win if they target the same dependency. Filter options (`WithPreLLMFilter`, `WithPreToolFilter`, `WithPostToolFilter`) and `WithPolicyHook` accept a single value per call but may be passed multiple times to build a chain.
 
 ```go title="Orchestrator with all components"
-orch := orchestrator.New(
+orch, err := orchestrator.New(
     anthropicProvider,
+    orchestrator.WithDefaultModel("claude-sonnet-4-5"),
+    orchestrator.WithMaxTurns(10),
     orchestrator.WithToolInvoker(myInvoker),
     orchestrator.WithPolicyHook(myPolicyHook),
     orchestrator.WithBudgetGuard(myGuard),
     orchestrator.WithPriceProvider(myPricing),
     orchestrator.WithCredentialResolver(myResolver),
     orchestrator.WithIdentitySigner(mySigner),
-    orchestrator.WithEventEmitter(myEmitter),
+    orchestrator.WithLifecycleEmitter(myEmitter),
     orchestrator.WithAttributeEnricher(myEnricher),
-    orchestrator.WithPreLLMFilters(redactFilter, logFilter),
-    orchestrator.WithPostToolFilters(auditFilter),
+    orchestrator.WithPreLLMFilter(redactFilter),
+    orchestrator.WithPreLLMFilter(logFilter),
+    orchestrator.WithPostToolFilter(auditFilter),
 )
 ```
 
@@ -82,9 +91,9 @@ orch := orchestrator.New(
 `Invoke` runs the full state machine to completion and returns the final result. The provided `context.Context` controls cancellation and deadline propagation.
 
 ```go title="Synchronous invocation"
-result, err := orch.Invoke(ctx, orchestrator.InvocationRequest{
+result, err := orch.Invoke(ctx, praxis.InvocationRequest{
     Messages: []llm.Message{
-        {Role: llm.RoleUser, Parts: []llm.MessagePart{{Type: llm.PartTypeText, Text: "Summarize this document."}}},
+        {Role: llm.RoleUser, Parts: []llm.MessagePart{llm.TextPart("Summarize this document.")}},
     },
 })
 ```
@@ -94,9 +103,9 @@ result, err := orch.Invoke(ctx, orchestrator.InvocationRequest{
 `InvokeStream` returns a channel of `event.InvocationEvent` values, allowing callers to observe each state transition as it happens. The channel closes when the invocation reaches a terminal state.
 
 ```go title="Streaming invocation"
-eventCh, err := orch.InvokeStream(ctx, orchestrator.InvocationRequest{
+eventCh, err := orch.InvokeStream(ctx, praxis.InvocationRequest{
     Messages: []llm.Message{
-        {Role: llm.RoleUser, Parts: []llm.MessagePart{{Type: llm.PartTypeText, Text: "Analyze this dataset."}}},
+        {Role: llm.RoleUser, Parts: []llm.MessagePart{llm.TextPart("Analyze this dataset.")}},
     },
 })
 for evt := range eventCh {

@@ -37,35 +37,50 @@ The package ships six production implementations: `anthropic.Provider`, `openai.
 
 | Field | Type | Description |
 |---|---|---|
-| `Messages` | `[]Message` | Conversation messages to send to the provider. |
-| `Model` | `string` | Model identifier (e.g., `"claude-sonnet-4-20250514"`). Empty string uses the provider default. |
+| `ExtraParams` | `map[string]any` | Provider-specific passthrough parameters (e.g., `"top_p"`, `"reasoning_effort"`). Adapters forward keys they recognize. |
+| `Model` | `string` | Model identifier (e.g., `"claude-sonnet-4-5"`). Empty string uses the provider default. |
+| `SystemPrompt` | `string` | System prompt. Providers that use a dedicated system field map this accordingly. |
+| `Messages` | `[]Message` | Conversation turns. |
 | `Tools` | `[]ToolDefinition` | Tool definitions for function calling. |
 | `MaxTokens` | `int` | Maximum tokens in the response. Zero uses the provider default. |
-| `Temperature` | `*float64` | Sampling temperature. `nil` uses the provider default. |
-| `StopSequences` | `[]string` | Sequences that halt generation. |
+| `Temperature` | `float64` | Sampling temperature. Zero means "use provider default" (not "deterministic"). |
 
 ### LLMResponse
 
 | Field | Type | Description |
 |---|---|---|
-| `Message` | `Message` | The assistant's response message. |
-| `InputTokens` | `int` | Tokens consumed by the input. |
-| `OutputTokens` | `int` | Tokens in the generated response. |
-| `Model` | `string` | Model that actually served the request (may differ from the requested model). |
+| `StopReason` | `StopReason` | Why generation stopped: `end_turn`, `tool_use`, `max_tokens`, `stop_sequence`. |
+| `Message` | `Message` | Assistant response message (may contain tool-call parts). |
+| `Usage` | `TokenUsage` | Token counts for this call. |
+
+### TokenUsage
+
+| Field | Type | Description |
+|---|---|---|
+| `InputTokens` | `int64` | Input tokens consumed on this call. |
+| `OutputTokens` | `int64` | Output tokens generated on this call. |
+| `CachedInputTokens` | `int64` | Input tokens served from prompt cache. Zero if the provider does not support/report caching. |
 
 ### Message
 
 | Field | Type | Description |
 |---|---|---|
-| `Role` | `Role` | One of `RoleUser`, `RoleAssistant`, `RoleSystem`. |
+| `Role` | `Role` | One of `RoleUser`, `RoleAssistant`, `RoleSystem`, `RoleTool`. |
 | `Parts` | `[]MessagePart` | Content fragments within the message. |
 
 ### MessagePart
 
-| Field | Type | Description |
+Exactly one content field is populated, determined by `Type`.
+
+| Field | Type | Populated when |
 |---|---|---|
-| `Type` | `PartType` | Content type discriminator (e.g., `PartTypeText`). |
-| `Text` | `string` | Text content. Populated when `Type` is `PartTypeText`. |
+| `Type` | `PartType` | — (discriminator: `PartTypeText`, `PartTypeToolCall`, `PartTypeToolResult`, `PartTypeImageURL`) |
+| `Text` | `string` | `Type == PartTypeText` |
+| `ToolCall` | `*LLMToolCall` | `Type == PartTypeToolCall` |
+| `ToolResult` | `*LLMToolResult` | `Type == PartTypeToolResult` |
+| `ImageURL` | `string` | `Type == PartTypeImageURL` |
+
+Convenience constructors: `llm.TextPart(text)`, `llm.ToolCallPart(call)`, `llm.ToolResultPart(result)`.
 
 ## Usage Patterns
 
