@@ -2,7 +2,7 @@
 title: Budget Enforcement
 description: Budget enforcement in praxis tracks four resource dimensions and transitions agents to a terminal state when any limit is breached.
 sidebar_label: Budget Enforcement
-sidebar_position: 5
+sidebar_position: 6
 keywords:
   - budget
   - cost tracking

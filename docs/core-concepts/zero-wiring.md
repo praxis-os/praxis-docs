@@ -2,7 +2,7 @@
 title: Zero-Wiring Defaults
 description: The praxis orchestrator is constructible with only an LLM provider because every optional component ships with a safe null default.
 sidebar_label: Zero-Wiring Defaults
-sidebar_position: 7
+sidebar_position: 8
 keywords:
   - zero wiring
   - defaults

@@ -1,8 +1,8 @@
 ---
 title: "Policy Hooks and Filters"
 description: "praxis enforces caller-defined policy at every security-sensitive boundary through a four-phase policy hook model and two filter chains that can pass, redact, log, or block data."
-sidebar_label: "Policy Hooks"
-sidebar_position: 4
+sidebar_label: "Policy Hooks and Filters"
+sidebar_position: 5
 keywords: [praxis, policy, hooks, filters, PreLLMFilter, PostToolFilter, PolicyHook, security, trust-boundary, redaction, allow-all]
 rag_section: "core-concepts"
 rag_packages: ["hooks"]

@@ -2,7 +2,7 @@
 title: Error Taxonomy
 description: The praxis error taxonomy classifies every framework error into one of seven kinds, each with defined retry semantics and terminal state mappings.
 sidebar_label: Error Taxonomy
-sidebar_position: 6
+sidebar_position: 7
 keywords:
   - errors
   - error handling

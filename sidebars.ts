@@ -20,6 +20,7 @@ const sidebars: SidebarsConfig = {
         'core-concepts/architecture',
         'core-concepts/state-machine',
         'core-concepts/provider-abstraction',
+        'core-concepts/policy-engine',
         'core-concepts/policy-hooks',
         'core-concepts/budget',
         'core-concepts/error-taxonomy',
