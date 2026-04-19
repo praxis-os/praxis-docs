@@ -1,95 +1,107 @@
 import type {ReactNode} from 'react';
-import Heading from '@theme/Heading';
 import styles from './styles.module.css';
 
 type FeatureItem = {
+  num: string;
+  pkg: string;
   title: string;
   description: ReactNode;
+  code: string;
 };
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Typed State Machine',
+    num: '01',
+    pkg: 'fsm',
+    title: 'Typed state machine',
     description: (
       <>
-        Every invocation flows through an explicit finite state machine with
-        allow-listed transitions and property-based tests. No procedural loops,
-        no hidden state.
+        13 invocation states, allow-listed transitions, property-based tests.
+        Every transition emits a span. Silent paths are a bug.
       </>
     ),
+    code: 'praxis/fsm',
   },
   {
-    title: 'Provider Agnostic',
+    num: '02',
+    pkg: 'hooks',
+    title: 'Filter chains',
     description: (
       <>
-        Swap LLM providers via a single <code>llm.Provider</code> interface.
-        Ships with Anthropic and OpenAI adapters. Your orchestration logic
-        stays the same.
+        Four phases: <code>PreInvocation</code>, <code>PreLLMInput</code>,{' '}
+        <code>PostToolOutput</code>, <code>PostInvocation</code>. Filters
+        return Pass · Redact · Log · Block.
       </>
     ),
+    code: 'praxis/hooks',
   },
   {
-    title: 'Policy Hooks',
+    num: '03',
+    pkg: 'budget',
+    title: 'Four-dimensional guard',
     description: (
       <>
-        Four-phase lifecycle hooks (<code>PreInvocation</code>,{' '}
-        <code>PreLLMInput</code>, <code>PostToolOutput</code>,{' '}
-        <code>PostInvocation</code>) with filter chains that can Pass, Redact,
-        Log, or Block.
+        Wall-clock · tokens · tool calls · cost in micro-dollars. Any breach
+        transitions the invocation to <code>BudgetExceeded</code>.
       </>
     ),
+    code: 'praxis/budget',
   },
   {
-    title: 'Budget Enforcement',
+    num: '04',
+    pkg: 'llm',
+    title: 'Provider agnostic',
     description: (
       <>
-        Four-dimensional cost control: wall-clock duration, LLM tokens, tool
-        call count, and estimated cost in micro-dollars. Any breach transitions
-        to <code>BudgetExceeded</code>.
+        One <code>llm.Provider</code> interface. Anthropic and OpenAI adapters
+        ship. Your orchestration logic stays the same across providers.
       </>
     ),
+    code: 'praxis/llm',
   },
   {
-    title: 'Observable by Default',
+    num: '05',
+    pkg: 'otel',
+    title: 'Observable by default',
     description: (
       <>
-        Mandatory OpenTelemetry spans at every state transition, 10 bounded
-        Prometheus metrics, and a neutral lifecycle event stream. Silent
-        paths are a bug.
+        Mandatory OpenTelemetry spans at every transition. 10 bounded Prometheus
+        metrics. Neutral lifecycle event stream. Nothing silent.
       </>
     ),
+    code: 'praxis/otel',
   },
   {
-    title: 'Zero-Wiring Start',
+    num: '06',
+    pkg: 'mcp',
+    title: 'Signed MCP tools',
     description: (
       <>
-        Constructible with just an <code>llm.Provider</code>. Every optional
-        component ships with a null default. Wire in policy, budget, tools,
-        and identity only when your workload requires them.
+        Ed25519-signed tool invocations with a trust-boundary classifier.
+        Untrusted output routes through PostTool filters automatically.
       </>
     ),
+    code: 'praxis/mcp',
   },
 ];
 
-function Feature({title, description}: FeatureItem) {
+function Feature({num, pkg, title, description, code}: FeatureItem) {
   return (
-    <div className={`${styles.featureCard} feature-card`}>
-      <Heading as="h3">{title}</Heading>
-      <p>{description}</p>
+    <div className={styles.feat}>
+      <div className={styles.featNum}>{num} · {pkg}</div>
+      <h3 className={styles.featTitle}>{title}</h3>
+      <p className={styles.featDesc}>{description}</p>
+      <code className={styles.featCode}>{code}</code>
     </div>
   );
 }
 
 export default function HomepageFeatures(): ReactNode {
   return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className={styles.grid}>
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
-          ))}
-        </div>
-      </div>
-    </section>
+    <div className={styles.grid}>
+      {FeatureList.map((props, idx) => (
+        <Feature key={idx} {...props} />
+      ))}
+    </div>
   );
 }

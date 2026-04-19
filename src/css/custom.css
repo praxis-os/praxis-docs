@@ -1,78 +1,777 @@
-:root {
-  --ifm-color-primary: #1a56db;
-  --ifm-color-primary-dark: #174cc5;
-  --ifm-color-primary-darker: #1548ba;
-  --ifm-color-primary-darkest: #113b99;
-  --ifm-color-primary-light: #1d60f1;
-  --ifm-color-primary-lighter: #2a6af2;
-  --ifm-color-primary-lightest: #4d83f5;
-  --ifm-code-font-size: 95%;
-  --ifm-font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --ifm-heading-font-weight: 600;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-}
+@import './praxis-tokens.css';
 
+/* =========================================================================
+   Dark mode (default) — Praxis token ramp as-is
+   ========================================================================= */
+:root,
 [data-theme='dark'] {
-  --ifm-color-primary: #60a5fa;
-  --ifm-color-primary-dark: #3b8ff8;
-  --ifm-color-primary-darker: #2884f7;
-  --ifm-color-primary-darkest: #0967e4;
-  --ifm-color-primary-light: #85bbfc;
-  --ifm-color-primary-lighter: #98c6fd;
-  --ifm-color-primary-lightest: #c0ddfe;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  /* --- IFM accent → Praxis teal ---------------------------------------- */
+  --ifm-color-primary:          var(--accent-500);
+  --ifm-color-primary-dark:     var(--accent-600);
+  --ifm-color-primary-darker:   var(--accent-700);
+  --ifm-color-primary-darkest:  var(--accent-800);
+  --ifm-color-primary-light:    var(--accent-400);
+  --ifm-color-primary-lighter:  var(--accent-300);
+  --ifm-color-primary-lightest: var(--accent-200);
+
+  /* --- Canvas ----------------------------------------------------------- */
+  --ifm-background-color:         var(--bg-0);
+  --ifm-background-surface-color: var(--bg-1);
+
+  /* --- Text ------------------------------------------------------------- */
+  --ifm-color-content:           var(--fg-0);
+  --ifm-color-content-secondary: var(--fg-1);
+  --ifm-heading-color:           var(--fg-0);
+  --ifm-font-color-base:         var(--fg-0);
+  --ifm-font-color-secondary:    var(--fg-1);
+
+  /* --- Typography ------------------------------------------------------- */
+  --ifm-font-family-base:       var(--font-ui);
+  --ifm-font-family-monospace:  var(--font-mono);
+  --ifm-font-size-base:         14px;
+  --ifm-line-height-base:       var(--lh-loose);
+  --ifm-heading-font-weight:    400;
+  --ifm-font-weight-bold:       600;
+
+  /* --- Heading sizes ---------------------------------------------------- */
+  --ifm-h1-font-size: 2.75rem;
+  --ifm-h2-font-size: 1.75rem;
+  --ifm-h3-font-size: 1.25rem;
+  --ifm-h4-font-size: 1rem;
+
+  /* --- Borders ---------------------------------------------------------- */
+  --ifm-color-emphasis-0:    var(--bg-0);
+  --ifm-color-emphasis-100:  var(--bg-1);
+  --ifm-color-emphasis-200:  var(--bg-2);
+  --ifm-color-emphasis-300:  var(--border-subtle);
+  --ifm-color-emphasis-400:  var(--border-default);
+  --ifm-color-emphasis-500:  var(--border-strong);
+  --ifm-color-emphasis-600:  var(--fg-3);
+  --ifm-color-emphasis-700:  var(--fg-2);
+  --ifm-color-emphasis-800:  var(--fg-1);
+  --ifm-color-emphasis-900:  var(--fg-0);
+  --ifm-color-emphasis-1000: #ffffff;
+
+  --ifm-hr-background-color:    var(--border-default);
+  --ifm-toc-border-color:       var(--border-default);
+
+  /* --- Links ------------------------------------------------------------ */
+  --ifm-link-color:       var(--accent-300);
+  --ifm-link-hover-color: var(--accent-200);
+  --ifm-link-decoration:  none;
+
+  /* --- Navbar ----------------------------------------------------------- */
+  --ifm-navbar-background-color:  var(--bg-1);
+  --ifm-navbar-shadow:            0 1px 0 var(--border-default);
+  --ifm-navbar-height:            52px;
+  --ifm-navbar-link-color:        var(--fg-1);
+  --ifm-navbar-link-hover-color:  var(--fg-0);
+  --ifm-navbar-link-active-color: var(--fg-0);
+
+  /* --- Footer ----------------------------------------------------------- */
+  --ifm-footer-background-color: var(--bg-1);
+  --ifm-footer-color:            var(--fg-2);
+  --ifm-footer-link-color:       var(--fg-1);
+  --ifm-footer-link-hover-color: var(--fg-0);
+  --ifm-footer-title-color:      var(--fg-0);
+
+  /* --- Sidebar menu ----------------------------------------------------- */
+  --ifm-menu-color:                    var(--fg-1);
+  --ifm-menu-color-active:             var(--fg-0);
+  --ifm-menu-color-background-active:  var(--bg-2);
+  --ifm-menu-color-background-hover:   var(--bg-2);
+  --ifm-sidebar-width:                 280px;
+
+  /* --- TOC -------------------------------------------------------------- */
+  --ifm-toc-link-color:        var(--fg-2);
+
+  /* --- Code ------------------------------------------------------------- */
+  --ifm-code-background:   var(--bg-2);
+  --ifm-code-color:        var(--fg-0);
+  --ifm-code-font-size:    0.875em;
+  --ifm-code-border-radius: var(--radius-1);
+  --ifm-code-padding-horizontal: 5px;
+  --ifm-code-padding-vertical:   1px;
+  --ifm-pre-background:    var(--bg-inset);
+  --ifm-pre-color:         var(--fg-0);
+  --ifm-pre-border-radius: var(--radius-2);
+  --docusaurus-highlighted-code-line-bg: rgba(10, 126, 158, 0.12);
+
+  /* --- Blockquote ------------------------------------------------------- */
+  --ifm-blockquote-color:         var(--fg-1);
+  --ifm-blockquote-border-color:  var(--accent-500);
+
+  /* --- Table ------------------------------------------------------------ */
+  --ifm-table-head-color:       var(--fg-2);
+  --ifm-table-head-background:  var(--bg-1);
+  --ifm-table-border-color:     var(--border-subtle);
+  --ifm-table-stripe-background: transparent;
+
+  /* --- Breadcrumb ------------------------------------------------------- */
+  --ifm-breadcrumb-color-active: var(--fg-0);
+
+  /* --- Tabs ------------------------------------------------------------- */
+  --ifm-tabs-color-active:         var(--fg-0);
+  --ifm-tabs-color-active-border:  var(--accent-500);
+  --ifm-tabs-color:                var(--fg-2);
+
+  /* --- Pagination ------------------------------------------------------- */
+  --ifm-pagination-border-color:   var(--border-default);
+
+  /* --- Alerts (callouts) ------------------------------------------------ */
+  --ifm-alert-border-radius: var(--radius-2);
+  --ifm-alert-border-width:  1px;
+  --ifm-alert-padding-horizontal: 16px;
+  --ifm-alert-padding-vertical:   14px;
+
+  /* --- Global ----------------------------------------------------------- */
+  --ifm-global-radius:        var(--radius-2);
+  --ifm-global-shadow-lw:     var(--shadow-2);
+  --ifm-global-shadow-md:     var(--shadow-3);
+  --ifm-global-shadow-tl:     var(--shadow-4);
+  --ifm-spacing-horizontal:   var(--sp-6);
+  --ifm-spacing-vertical:     var(--sp-6);
 }
 
-/* Hero section */
-.hero--primary {
-  --ifm-hero-background-color: #0f172a;
-  --ifm-hero-text-color: #f8fafc;
+/* =========================================================================
+   Light mode — tokens defined in praxis-tokens.css; only IFM primary
+   needs an explicit pointer here because it must shift to accent-600
+   (the AA-compliant stop on a white canvas, 4.9:1).
+   Everything else (bg-*, fg-*, borders, shadows, state palette) resolves
+   automatically from the [data-theme='light'] block in praxis-tokens.css.
+   ========================================================================= */
+[data-theme='light'] {
+  --ifm-color-primary:          var(--accent-600);
+  --ifm-color-primary-dark:     var(--accent-700);
+  --ifm-color-primary-darker:   var(--accent-700);
+  --ifm-color-primary-darkest:  var(--accent-800);
+  --ifm-color-primary-light:    var(--accent-500);
+  --ifm-color-primary-lighter:  var(--accent-400);
+  --ifm-color-primary-lightest: var(--accent-300);
+
+  /* Links — accent-300/200 are too light on paper; use 600/700 */
+  --ifm-link-color:       var(--accent-600);
+  --ifm-link-hover-color: var(--accent-700);
+
+  /* Blockquote accent border */
+  --ifm-blockquote-border-color: var(--accent-600);
+
+  /* Code — inset bg stays readable on paper canvas */
+  --ifm-code-background: var(--bg-2);
+  --ifm-pre-background:  var(--bg-inset);
+
+  --docusaurus-highlighted-code-line-bg: rgba(10, 106, 134, 0.08);
+
+  /* IFM global shadows — light uses shadow-2/3/4 from tokens (paper-friendly) */
+  --ifm-global-shadow-lw: var(--shadow-2);
+  --ifm-global-shadow-md: var(--shadow-3);
+  --ifm-global-shadow-tl: var(--shadow-4);
 }
 
-[data-theme='dark'] .hero--primary {
-  --ifm-hero-background-color: #020617;
-}
-
-.hero__title {
-  font-size: 3.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.hero__subtitle {
-  font-size: 1.4rem;
-  opacity: 0.85;
-}
-
-/* Feature cards */
-.feature-card {
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  border: 1px solid var(--ifm-color-emphasis-200);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.feature-card:hover {
-  border-color: var(--ifm-color-primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-[data-theme='dark'] .feature-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* Announcement bar */
+/* =========================================================================
+   Announcement bar — Praxis warn-palette instead of bootstrap yellow
+   ========================================================================= */
 div[class*='announcementBar'] {
-  font-size: 0.9rem;
+  background-color: var(--warn-bg) !important;
+  color: var(--warn-400) !important;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border-bottom: 1px solid #3a2d1a;
+}
+
+div[class*='announcementBar'] a {
+  color: var(--warn-400);
+  text-decoration: underline;
+}
+
+div[class*='announcementBarClose'] {
+  color: var(--warn-500) !important;
+}
+
+/* =========================================================================
+   Navbar overrides
+   ========================================================================= */
+.navbar {
+  border-bottom: 1px solid var(--border-default);
+  height: var(--ifm-navbar-height);
+  padding: 0 var(--sp-6);
+}
+
+.navbar__brand {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--fg-0);
+  margin-right: var(--sp-4);
+}
+
+.navbar__title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--fg-0);
+}
+
+.navbar__logo {
+  height: 24px;
+  width: 24px;
+  margin-right: var(--sp-2);
+}
+
+.navbar__item {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.navbar__link {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--fg-1);
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+
+.navbar__link:hover,
+.navbar__link--active {
+  color: var(--fg-0);
+}
+
+/* Search box */
+.navbar__search-input {
+  background: var(--bg-inset);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--fg-2);
+}
+
+/* =========================================================================
+   Sidebar menu
+   ========================================================================= */
+.menu {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  padding: var(--sp-4) 0;
+  background: var(--bg-1);
+}
+
+.menu__list {
+  padding-left: 0;
+}
+
+.menu__link {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--fg-1);
+  border-radius: 0;
+  padding: 5px var(--sp-5);
+  transition: color var(--dur-fast) var(--ease-standard),
+              background var(--dur-fast) var(--ease-standard);
+  border-left: 2px solid transparent;
+}
+
+.menu__link:hover {
+  color: var(--fg-0);
+  background: var(--bg-2);
+  border-left-color: var(--border-strong);
+}
+
+.menu__link--active {
+  color: var(--fg-0);
+  background: var(--bg-2);
+  border-left: 2px solid var(--ifm-color-primary);
   font-weight: 500;
 }
 
-/* Code blocks */
-.prism-code {
-  font-size: 0.875rem;
+.menu__link--active:hover {
+  border-left-color: var(--ifm-color-primary-light);
 }
 
-/* Sidebar */
-.menu__link {
-  font-size: 0.9rem;
+.menu__list-item-collapsible .menu__link {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--fg-3);
+  font-weight: 500;
+  padding-top: var(--sp-3);
+}
+
+.menu__list-item-collapsible .menu__link:hover {
+  color: var(--fg-2);
+  background: transparent;
+  border-left-color: transparent;
+}
+
+/* Sub-items (nested) */
+.menu__list .menu__list .menu__link {
+  font-size: 11px;
+  color: var(--fg-2);
+  padding-left: 32px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.menu__list .menu__list .menu__link--active {
+  color: var(--fg-0);
+}
+
+/* =========================================================================
+   Table of contents (right TOC)
+   ========================================================================= */
+.table-of-contents {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  border-left: 1px solid var(--border-default);
+  padding-left: var(--sp-4);
+}
+
+.table-of-contents__link {
+  color: var(--fg-2);
+  display: block;
+  padding: 3px 0;
+  line-height: var(--lh-snug);
+  transition: color var(--dur-fast) var(--ease-standard);
+  border-left: none;
+}
+
+.table-of-contents__link:hover,
+.table-of-contents__link--active {
+  color: var(--fg-0);
+}
+
+.table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+}
+
+/* =========================================================================
+   Article / doc markdown
+   ========================================================================= */
+.theme-doc-markdown,
+article.markdown {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: var(--lh-loose);
+  color: var(--fg-1);
+}
+
+/* Headings */
+.theme-doc-markdown h1,
+article.markdown h1 {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  letter-spacing: 0.01em;
+  color: var(--fg-0);
+  margin-bottom: var(--sp-2);
+}
+
+.theme-doc-markdown h2,
+article.markdown h2 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: var(--lh-snug);
+  letter-spacing: 0.005em;
+  color: var(--fg-0);
+  margin-top: var(--sp-12);
+  margin-bottom: var(--sp-2);
+  padding-top: var(--sp-8);
+  border-top: 1px solid var(--border-default);
+}
+
+.theme-doc-markdown h2:first-of-type,
+article.markdown h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: var(--sp-2);
+}
+
+.theme-doc-markdown h3,
+article.markdown h3 {
+  font-family: var(--font-ui);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  color: var(--fg-0);
+  margin-top: var(--sp-7, 28px);
+  margin-bottom: var(--sp-1);
+}
+
+.theme-doc-markdown h4,
+article.markdown h4 {
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--fg-0);
+}
+
+/* Paragraph / list */
+.theme-doc-markdown p,
+article.markdown p {
+  color: var(--fg-1);
+  margin-bottom: 14px;
+}
+
+.theme-doc-markdown ul,
+.theme-doc-markdown ol,
+article.markdown ul,
+article.markdown ol {
+  color: var(--fg-1);
+}
+
+/* Inline code */
+.theme-doc-markdown code,
+article.markdown code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-1);
+  padding: 1px 5px;
+  color: var(--fg-0);
+}
+
+/* Pre / code blocks */
+.theme-doc-markdown pre,
+article.markdown pre,
+div[class*='codeBlock'],
+div[class*='codeBlockContainer'] {
+  background: var(--bg-inset) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-2) !important;
+  box-shadow: none !important;
+}
+
+div[class*='codeBlock'] code,
+div[class*='codeBlockContainer'] code,
+.prism-code {
+  background: transparent !important;
+  border: none !important;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--fg-0);
+}
+
+div[class*='codeBlockTitle'] {
+  background: var(--bg-1) !important;
+  border-bottom: 1px solid var(--border-default) !important;
+  font-family: var(--font-mono) !important;
+  font-size: var(--text-xs) !important;
+  color: var(--fg-1) !important;
+  border-radius: var(--radius-2) var(--radius-2) 0 0 !important;
+}
+
+div[class*='codeBlockLang'] {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--fg-2);
+}
+
+/* Tables */
+.theme-doc-markdown table,
+article.markdown table {
+  font-size: 13px;
+  border-collapse: collapse;
+  width: 100%;
+  margin: var(--sp-4) 0 var(--sp-6);
+}
+
+.theme-doc-markdown th,
+article.markdown th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--fg-2);
+  font-weight: 500;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border-default);
+  padding: 8px 12px;
+}
+
+.theme-doc-markdown td,
+article.markdown td {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--fg-1);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+}
+
+.theme-doc-markdown td:first-child,
+article.markdown td:first-child {
+  color: var(--fg-0);
+}
+
+/* No vertical borders on tables */
+.theme-doc-markdown table td,
+.theme-doc-markdown table th,
+article.markdown table td,
+article.markdown table th {
+  border-left: none;
+  border-right: none;
+}
+
+/* =========================================================================
+   Alerts / Admonitions (callouts)
+   ========================================================================= */
+.alert {
+  border-radius: var(--radius-2);
+  border-left-width: 3px;
+  padding: var(--sp-3) var(--sp-4);
+  margin: var(--sp-5) 0;
+}
+
+.alert--info {
+  background: var(--info-bg);
+  border-color: var(--info-500);
+  color: var(--fg-1);
+}
+
+.alert--info .alert__heading {
+  color: var(--info-500);
+}
+
+.alert--warning {
+  background: var(--warn-bg);
+  border-color: var(--warn-500);
+  color: var(--fg-1);
+}
+
+.alert--warning .alert__heading {
+  color: var(--warn-400);
+}
+
+.alert--danger {
+  background: var(--err-bg);
+  border-color: var(--err-500);
+  color: var(--fg-1);
+}
+
+.alert--danger .alert__heading {
+  color: var(--err-400);
+}
+
+.alert--success {
+  background: var(--ok-bg);
+  border-color: var(--ok-500);
+  color: var(--fg-1);
+}
+
+.alert--success .alert__heading {
+  color: var(--ok-400);
+}
+
+.alert .alert__heading {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: var(--sp-2);
+}
+
+/* =========================================================================
+   Pagination nav (prev / next page)
+   ========================================================================= */
+.pagination-nav {
+  margin-top: var(--sp-12);
+  padding-top: var(--sp-8);
+  border-top: 1px solid var(--border-default);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+
+.pagination-nav__link {
+  display: block;
+  padding: 14px 18px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2);
+  background: var(--bg-1);
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--border-strong);
+  text-decoration: none;
+}
+
+.pagination-nav__sublabel {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--fg-3);
+  display: block;
+  margin-bottom: var(--sp-1);
+}
+
+.pagination-nav__label {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--fg-0);
+  font-weight: 500;
+}
+
+/* =========================================================================
+   Breadcrumb
+   ========================================================================= */
+.breadcrumbs {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--fg-2);
+}
+
+.breadcrumbs__link {
+  color: var(--fg-2);
+}
+
+.breadcrumbs__link:hover {
+  color: var(--fg-0);
+}
+
+.breadcrumbs__item--active .breadcrumbs__link {
+  color: var(--fg-0);
+}
+
+/* =========================================================================
+   Tabs
+   ========================================================================= */
+.tabs {
+  border-bottom: 1px solid var(--border-default);
+}
+
+.tabs__item {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--fg-2);
+  border-bottom: 2px solid transparent;
+  padding: 8px 14px;
+  margin-bottom: -1px;
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+
+.tabs__item:hover {
+  color: var(--fg-0);
+}
+
+.tabs__item--active {
+  color: var(--fg-0);
+  border-bottom-color: var(--ifm-color-primary);
+}
+
+/* =========================================================================
+   Doc sidebar (overall container)
+   ========================================================================= */
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--border-default) !important;
+}
+
+.theme-doc-sidebar-menu {
+  font-size: var(--text-sm);
+}
+
+/* Category labels */
+.menu__list-item--collapsed .menu__link:not(.menu__link--active) {
+  color: var(--fg-3);
+}
+
+/* =========================================================================
+   Footer
+   ========================================================================= */
+.footer {
+  background: var(--bg-1);
+  border-top: 1px solid var(--border-default);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.footer__title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--fg-3);
+  font-weight: 500;
+}
+
+.footer__link-item {
+  color: var(--fg-1);
+  line-height: 2;
+}
+
+.footer__link-item:hover {
+  color: var(--fg-0);
+  text-decoration: none;
+}
+
+.footer__copyright {
+  color: var(--fg-3);
+  font-size: var(--text-xs);
+}
+
+/* =========================================================================
+   Focus rings — global teal outline
+   ========================================================================= */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* =========================================================================
+   Docusaurus doc page article header
+   ========================================================================= */
+.theme-doc-version-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  border-radius: var(--radius-1);
+  background: var(--accent-900);
+  color: var(--accent-300);
+  border: 1px solid var(--accent-700);
+}
+
+/* Edit page / last updated line */
+.theme-last-updated {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--fg-2);
+}
+
+/* =========================================================================
+   Scrollbar (WebKit)
+   ========================================================================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-1);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* =========================================================================
+   Mobile sidebar drawer
+   ========================================================================= */
+.navbar-sidebar {
+  background: var(--bg-1) !important;
+  border-right: 1px solid var(--border-default);
+}
+
+.navbar-sidebar__backdrop {
+  background: rgba(0, 0, 0, 0.6);
 }

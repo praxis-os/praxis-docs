@@ -1,5 +1,11 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="40" height="40" rx="8" fill="#1a56db"/>
-  <path d="M12 12h6v6h-6zM22 12h6v6h-6zM12 22h6v6h-6zM22 22h6v6h-6z" fill="#fff" opacity="0.9"/>
-  <path d="M18 15h4M20 18v4M18 25h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" aria-label="Praxis OS">
+  
+  <rect width="40" height="40" rx="6" fill="#0c0f12"></rect>
+  <rect x="0.5" y="0.5" width="39" height="39" rx="5.5" fill="none" stroke="#242c33"></rect>
+  
+  <path d="M10 11 L17 20 L10 29" stroke="#e6edf3" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+  
+  <path d="M30 11 L23 20 L30 29" stroke="#0a7e9e" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+  
+  <line x1="20" y1="13" x2="20" y2="27" stroke="#323c45" stroke-width="1"></line>
 </svg>

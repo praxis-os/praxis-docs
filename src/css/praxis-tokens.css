@@ -1,0 +1,261 @@
+/* =========================================================================
+   Praxis OS — Design Tokens
+   Dark-first, low-saturation, developer-infrastructure palette.
+   Built around the logo's teal accent (#0a7e9e) on a cool infra-grey canvas.
+   ========================================================================= */
+
+/* -- Fonts ---------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'Lady Ice';
+  src: url('/fonts/lady-ice.expanded.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* === Neutral canvas (dark-first) ===================================== */
+  --bg-0:            #07090b;
+  --bg-1:            #0c0f12;
+  --bg-2:            #12161a;
+  --bg-3:            #181d22;
+  --bg-4:            #1f252b;
+  --bg-inset:        #05070a;
+
+  /* === Borders ========================================================= */
+  --border-subtle:   #1a2026;
+  --border-default:  #242c33;
+  --border-strong:   #323c45;
+  --border-accent:   #0a7e9e;
+
+  /* === Foreground ====================================================== */
+  --fg-0:            #e6edf3;
+  --fg-1:            #b8c2cc;
+  --fg-2:            #7d8a96;
+  --fg-3:            #4f5b66;
+  --fg-on-accent:    #07090b;
+
+  /* === Brand accent (teal, from logo) ================================== */
+  --accent-900:      #042f3c;
+  --accent-800:      #083f51;
+  --accent-700:      #0a5066;
+  --accent-600:      #0a6a86;
+  --accent-500:      #0a7e9e;   /* PRIMARY dark — the logo teal */
+  --accent-400:      #2896b4;
+  --accent-300:      #4fb0cb;
+  --accent-200:      #8acad9;
+  --accent-100:      #c5e5ec;
+  --accent-glow:     #0a7e9e33;
+
+  /* === Semantic — state colors ========================================= */
+  --ok-500:          #3f9960;
+  --ok-400:          #5fb37f;
+  --ok-bg:           #0e1f16;
+
+  --warn-500:        #c89247;
+  --warn-400:        #dea969;
+  --warn-bg:         #241a0e;
+
+  --err-500:         #c45a5a;
+  --err-400:         #d97878;
+  --err-bg:          #241212;
+
+  --info-500:        #5a8bc4;
+  --info-bg:         #0e1724;
+
+  --muted-500:       #6b7680;
+  --muted-bg:        #171a1d;
+
+  /* === Lifecycle state palette ========================================= */
+  --state-created:      var(--muted-500);
+  --state-initializing: #8a93c4;
+  --state-pre-hook:     #9a7fb8;
+  --state-llm-call:     var(--accent-400);
+  --state-tool-decision:#b89a5f;
+  --state-tool-call:    var(--warn-500);
+  --state-post-filter:  #7fb89a;
+  --state-continuation: var(--accent-300);
+  --state-post-hook:    #9a7fb8;
+  --state-completed:    var(--ok-500);
+  --state-failed:       var(--err-500);
+  --state-cancelled:    var(--muted-500);
+  --state-budget-exceeded: var(--err-400);
+
+  /* === Trust boundary palette ========================================== */
+  --trust-trusted:   var(--ok-500);
+  --trust-untrusted: var(--warn-500);
+  --trust-denied:    var(--err-500);
+
+  /* === Typography ====================================================== */
+  --font-mono:       'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-ui:         'Inter Tight', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display:    'Lady Ice', 'Inter Tight', ui-sans-serif, sans-serif;
+
+  --text-2xs:  10px;
+  --text-xs:   11px;
+  --text-sm:   12px;
+  --text-base: 13px;
+  --text-md:   14px;
+  --text-lg:   16px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+  --text-3xl:  32px;
+  --text-4xl:  44px;
+  --text-5xl:  64px;
+
+  --lh-tight:  1.15;
+  --lh-snug:   1.35;
+  --lh-normal: 1.5;
+  --lh-loose:  1.7;
+
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-caps:   0.08em;
+
+  /* === Spacing (4px grid) ============================================== */
+  --sp-0:    0;
+  --sp-px:   1px;
+  --sp-0-5:  2px;
+  --sp-1:    4px;
+  --sp-2:    8px;
+  --sp-3:    12px;
+  --sp-4:    16px;
+  --sp-5:    20px;
+  --sp-6:    24px;
+  --sp-8:    32px;
+  --sp-10:   40px;
+  --sp-12:   48px;
+  --sp-16:   64px;
+  --sp-20:   80px;
+  --sp-24:   96px;
+
+  /* === Radii =========================================================== */
+  --radius-0:    0;
+  --radius-1:    2px;
+  --radius-2:    4px;
+  --radius-3:    6px;
+  --radius-4:    8px;
+  --radius-pill: 999px;
+
+  /* === Elevation — dark (borders > shadows) ============================ */
+  --shadow-0:      none;
+  --shadow-1:      0 1px 0 rgba(0,0,0,0.4);
+  --shadow-2:      0 2px 6px rgba(0,0,0,0.35), 0 0 0 1px var(--border-default);
+  --shadow-3:      0 8px 24px rgba(0,0,0,0.45), 0 0 0 1px var(--border-default);
+  --shadow-4:      0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px var(--border-strong);
+  --shadow-focus:  0 0 0 2px var(--bg-0), 0 0 0 4px var(--accent-500);
+  --shadow-inset:  inset 0 1px 0 rgba(255,255,255,0.02);
+
+  /* === Motion ========================================================== */
+  --dur-instant:     80ms;
+  --dur-fast:        120ms;
+  --dur-base:        180ms;
+  --dur-slow:        260ms;
+  --ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0.1, 1);
+  --ease-linear:     linear;
+
+  /* === Layout ========================================================== */
+  --content-max: 1440px;
+  --gutter:      var(--sp-6);
+  --panel-min:   280px;
+
+  /* === Z =============================================================== */
+  --z-base:    0;
+  --z-sticky:  10;
+  --z-overlay: 50;
+  --z-modal:   100;
+  --z-toast:   200;
+}
+
+/* =========================================================================
+   LIGHT THEME
+   Design target: off-white "paper" canvas that reads as an engineering
+   document. Accent shifts to #0a6a86 (AA on #fff). Semantic backgrounds
+   become tinted paper washes. Shadows take over from borders.
+   ========================================================================= */
+[data-theme='light'] {
+  /* Canvas */
+  --bg-0:     #fafbfc;   /* app background — paper */
+  --bg-1:     #ffffff;   /* panel / card surface */
+  --bg-2:     #f4f6f8;   /* raised card / menu */
+  --bg-3:     #eaeef2;   /* hover / selected row */
+  --bg-4:     #dde3e9;   /* input / pressed */
+  --bg-inset: #f0f2f5;   /* code / terminal inset */
+
+  /* Borders */
+  --border-subtle:  #e6eaef;
+  --border-default: #d3dae0;
+  --border-strong:  #aab4bd;
+  --border-accent:  #0a6a86;
+
+  /* Foreground — near-ink with verified contrast ratios */
+  --fg-0:         #0b1116;   /* 17.3:1 on #fff */
+  --fg-1:         #3a4550;   /* 9.7:1 */
+  --fg-2:         #5a6772;   /* 5.8:1 */
+  --fg-3:         #8a95a0;   /* 3.5:1 — decorative only */
+  --fg-on-accent: #ffffff;   /* text on teal buttons */
+
+  /* Accent — primary shifts to 600 for AA on white (4.9:1) */
+  --accent-900: #042f3c;
+  --accent-800: #083f51;
+  --accent-700: #0a5066;
+  --accent-600: #0a6a86;   /* PRIMARY on light */
+  --accent-500: #0a7e9e;   /* logo teal — decorative only on light */
+  --accent-400: #2896b4;
+  --accent-300: #4fb0cb;
+  --accent-200: #8acad9;
+  --accent-100: #dcf0f5;   /* selected-state tint bg */
+  --accent-glow: #0a6a8633;
+
+  /* Semantic — darkened for paper contrast */
+  --ok-500:  #2d7a4a;   /* 4.9:1 on #fff */
+  --ok-400:  #3f9960;
+  --ok-bg:   #e8f3ec;
+
+  --warn-500: #9c6a1e;  /* 4.7:1 on #fff */
+  --warn-400: #c89247;
+  --warn-bg:  #faefdc;
+
+  --err-500:  #a63838;  /* 5.9:1 on #fff */
+  --err-400:  #c45a5a;
+  --err-bg:   #fbe7e7;
+
+  --info-500: #2d5fa0;  /* 5.6:1 on #fff */
+  --info-bg:  #e5edf8;
+
+  --muted-500: #6b7680;
+  --muted-bg:  #eef1f4;
+
+  /* Lifecycle states — one stop darker for 3:1 on light cards */
+  --state-created:       #6b7680;
+  --state-initializing:  #5868a8;
+  --state-pre-hook:      #7256a0;
+  --state-llm-call:      #137a99;
+  --state-tool-decision: #8a6e2e;
+  --state-tool-call:     #9c6a1e;
+  --state-post-filter:   #3d7a5c;
+  --state-continuation:  #2896b4;
+  --state-post-hook:     #7256a0;
+  --state-completed:     var(--ok-500);
+  --state-failed:        var(--err-500);
+  --state-cancelled:     #6b7680;
+  --state-budget-exceeded: var(--err-500);
+
+  /* Trust */
+  --trust-trusted:   var(--ok-500);
+  --trust-untrusted: var(--warn-500);
+  --trust-denied:    var(--err-500);
+
+  /* Shadows — paper relies on shadows more than borders for depth */
+  --shadow-0:     none;
+  --shadow-1:     0 1px 0 rgba(15,23,31,0.04);
+  --shadow-2:     0 1px 2px rgba(15,23,31,0.06), 0 1px 3px rgba(15,23,31,0.08);
+  --shadow-3:     0 4px 8px rgba(15,23,31,0.06), 0 8px 16px rgba(15,23,31,0.08);
+  --shadow-4:     0 12px 24px rgba(15,23,31,0.08), 0 24px 48px rgba(15,23,31,0.10);
+  --shadow-focus: 0 0 0 2px var(--bg-0), 0 0 0 4px var(--accent-600);
+  --shadow-inset: inset 0 1px 0 rgba(15,23,31,0.02);
+}

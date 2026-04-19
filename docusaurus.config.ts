@@ -60,20 +60,20 @@ const config: Config = {
   themeConfig: {
     image: 'img/social-card.png',
     colorMode: {
-      respectPrefersColorScheme: true,
+      defaultMode: 'dark',
+      disableSwitch: false,
+      respectPrefersColorScheme: false,
     },
     announcementBar: {
       id: 'v0x_unstable_v09',
       content:
         'Docs cover root <strong>v0.9.x</strong> with <code>praxis/mcp</code> v0.7 and <code>praxis/skills</code> v0.9 sub-modules. APIs may change before v1.0. <a href="/docs/getting-started/introduction#versioning-and-stability">Learn more</a>',
-      backgroundColor: '#fff3cd',
-      textColor: '#856404',
       isCloseable: true,
     },
     navbar: {
       title: 'praxis',
       logo: {
-        alt: 'praxis logo',
+        alt: 'Praxis OS',
         src: 'img/logo.svg',
       },
       items: [

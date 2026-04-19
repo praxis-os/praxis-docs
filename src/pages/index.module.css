@@ -1,46 +1,398 @@
-.heroBanner {
-  padding: 4rem 0;
-  text-align: center;
+/* =========================================================================
+   Homepage — Praxis OS Marketing Surface
+   ========================================================================= */
+
+/* === Hero ================================================================ */
+.hero {
+  padding: 88px 0 64px;
   position: relative;
+  border-bottom: 1px solid var(--border-default);
   overflow: hidden;
+  background: var(--bg-0);
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
+/* Subtle dot-grid vignette behind hero */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.45;
+  background-image:
+    linear-gradient(var(--border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at 50% 0, black 0%, transparent 70%);
+}
+
+.heroGrid {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+@media (max-width: 996px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
   }
 }
 
-.heroDescription {
-  max-width: 640px;
-  margin: 1rem auto 2rem;
-  font-size: 1.1rem;
-  opacity: 0.8;
-  line-height: 1.6;
+.heroLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-.buttons {
+/* Eyebrow chip */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-1);
+  width: fit-content;
+  margin-bottom: 20px;
+}
+
+.eyebrowDot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--accent-500);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Lady Ice display heading */
+.display {
+  font-family: var(--font-display);
+  font-size: 76px;
+  line-height: 0.98;
+  letter-spacing: 0.005em;
+  color: var(--fg-0);
+  margin: 0 0 20px;
+  font-weight: 400;
+}
+
+@media (max-width: 1200px) {
+  .display {
+    font-size: 60px;
+  }
+}
+
+@media (max-width: 996px) {
+  .display {
+    font-size: 52px;
+  }
+}
+
+.accentX {
+  color: var(--accent-500);
+}
+
+.heroSub {
+  font-size: 17px;
+  color: var(--fg-1);
+  max-width: 520px;
+  line-height: 1.55;
+  margin: 0 0 28px;
+}
+
+.heroCta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.heroMeta {
+  margin-top: 28px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-2);
+}
+
+.heroMeta b {
+  color: var(--fg-0);
+  font-weight: 500;
+}
+
+/* === Buttons ============================================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--border-default);
+  background: var(--bg-2);
+  color: var(--fg-0);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-standard);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background: var(--bg-3);
+  border-color: var(--border-strong);
+  color: var(--fg-0);
+  text-decoration: none;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--accent-500);
+  background: var(--accent-500);
+  color: var(--fg-on-accent);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-standard);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btnPrimary:hover {
+  background: var(--accent-400);
+  border-color: var(--accent-400);
+  color: var(--fg-on-accent);
+  text-decoration: none;
+}
+
+/* === Terminal panel ====================================================== */
+.term {
+  background: var(--bg-1);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-3);
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.termBar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border-default);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-2);
 }
 
-.quickStart {
-  padding: 4rem 0;
-  background: var(--ifm-color-emphasis-100);
+.termDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bg-4);
+  flex-shrink: 0;
 }
 
-[data-theme='dark'] .quickStart {
-  background: var(--ifm-color-emphasis-100);
+.termFn {
+  margin-left: 8px;
+  color: var(--fg-2);
 }
 
-.codeBlock {
-  background: #1e293b;
-  color: #e2e8f0;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  overflow-x: auto;
+.termPre {
   margin: 0;
+  padding: 18px 20px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--fg-0);
+  overflow-x: auto;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.termPre code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  color: var(--fg-0);
+}
+
+/* Syntax highlight tokens used in dangerouslySetInnerHTML */
+:global(.c-kw) { color: #c89247; }
+:global(.c-fn) { color: var(--accent-300); }
+:global(.c-str) { color: #7fb89a; }
+:global(.c-cm) { color: var(--fg-2); font-style: italic; }
+:global(.c-num) { color: #dea969; }
+:global(.c-tp) { color: #b89a5f; }
+:global(.c-pk) { color: #9a7fb8; }
+:global(.c-id) { color: var(--fg-0); }
+
+/* === Section wrapper ===================================================== */
+.section {
+  padding: 80px 0;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-0);
+}
+
+.sectionInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Section heading */
+.anchor {
+  font-family: var(--font-display);
+  font-size: 44px;
+  letter-spacing: 0.005em;
+  color: var(--fg-0);
+  margin: 0 0 12px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.lede {
+  font-size: 15px;
+  color: var(--fg-1);
+  max-width: 620px;
+  margin: 0 0 40px;
+  line-height: 1.6;
+}
+
+/* === Metrics strip ======================================================= */
+.metricsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-3);
+  overflow: hidden;
+}
+
+@media (max-width: 996px) {
+  .metricsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.metric {
+  padding: 24px 22px;
+  border-right: 1px solid var(--border-default);
+  background: var(--bg-1);
+}
+
+.metric:last-child {
+  border-right: none;
+}
+
+.metricLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+.metricValue {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  color: var(--fg-0);
+  margin-top: 6px;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.metricUnit {
+  font-size: 14px;
+  color: var(--fg-2);
+  margin-left: 4px;
+}
+
+.metricSub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-2);
+  margin-top: 4px;
+}
+
+/* === Quick start 2-col =================================================== */
+.quickGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 48px;
+  align-items: start;
+}
+
+@media (max-width: 996px) {
+  .quickGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+.quickBody {
+  color: var(--fg-1);
+  font-size: 14px;
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+/* === CTA block =========================================================== */
+.ctaBlock {
+  background: var(--bg-1);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-4);
+  padding: 48px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (max-width: 996px) {
+  .ctaBlock {
+    grid-template-columns: 1fr;
+    padding: 32px;
+  }
+}
+
+.ctaTitle {
+  font-family: var(--font-display);
+  font-size: 36px;
+  letter-spacing: 0.005em;
+  color: var(--fg-0);
+  margin: 0 0 12px;
+  line-height: 1.05;
+  font-weight: 400;
+}
+
+.ctaBody {
+  font-size: 14px;
+  color: var(--fg-1);
+  margin: 0 0 24px;
+  line-height: 1.65;
+  max-width: 440px;
 }
